@@ -75,7 +75,7 @@ function leastMeanSquaresFilteredX
     errIdentBuffer = zeros(1, cntSample);
 
     disp("[INFO] Apply and run LMS aglorithm.");
-    learningRate = 0.1;
+    learningRate = 0.08;
     for sampleIds = 1:cntSample
         estSdTransferFuncSigState = [ corruptedSignal(sampleIds) ...
             estSdTransferFuncSigState(1:15)];
@@ -101,7 +101,7 @@ function leastMeanSquaresFilteredX
     fxlmsValuesState = zeros(1,16);
 
     disp("[INFO] Apply and run FxLMS aglorithm.");
-    learningRate=0.1;
+    learningRate=0.08;
     for sampleIds = 1:cntSample
         fxlmsState = [corruptedSignal(sampleIds) fxlmsState(1:15)];   
         fxlmsOutput = sum(fxlmsState .* fxlmsWeight);
@@ -117,5 +117,29 @@ function leastMeanSquaresFilteredX
     end
     disp("[INFO] Calculate FxLMS algorithm and output values done.");
 
+    %% Report the result
+    figure
+    subplot(4,1,1)
+    plot(1:cntSample, desiredSignal)
+    ylabel('Amplitude');
+    xlabel('Discrete time k');
+    legend('Desired signal')
+    subplot(4,1,2)
+    plot(1:cntSample, corruptedSignal)
+    ylabel('Amplitude');
+    xlabel('Discrete time k');
+    legend('Corrupted signal')
+    subplot(4,1,3)
+    plot(1:cntSample, transferFuncSig) 
+    hold on 
+    plot(1:cntSample, transferFuncSig-errControlBuffer, 'r:')
+    ylabel('Amplitude');
+    xlabel('Discrete time k');
+    legend('Noise signal', 'Control signal')
+    subplot(4,1,4)
+    plot(1:cntSample, errControlBuffer)
+    ylabel('Amplitude');
+    xlabel('Discrete time k');
+    legend('Noise residue')
 
 end
