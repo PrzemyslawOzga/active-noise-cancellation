@@ -29,35 +29,9 @@ function ancFeedforwardFxLMS
 
     addpath('./include');
 
-    %% Generating desired signal
-    fs = 16000;
-
-    % Generate sine desired signal
-    disp("[INFO] Generate desired noise signal.");
-    desiredSignalDuration = 0.001:0.001:1;
-    desiredSignal = sin(2*pi*50*desiredSignalDuration);
-
-    % Generate singe corrupted signal with noise
-    disp("[INFO] Generate corrupted of noise desiredSignal.");
+    %% Generating and save desired and corrupted signal
+    [desiredSignal, corruptedSignal] = generateTestSignals;
     cntSample = numel(desiredSignal);
-    corruptedSignal = desiredSignal( ...
-        1:cntSample) + 0.9*randn(1,cntSample);
-
-    % Finalize and save desired signal and corrupted signal
-    disp("[INFO] Saving sequences.");
-    outputFilepath = './testSamples/';
-    desiredSignalFilename = 'desiredSignal.wav';
-    corruptedSignalFilename = 'corruptedSignal.wav';
-
-    audiowrite( ...
-        strcat(outputFilepath, desiredSignalFilename), ...
-        desiredSignal, fs, 'BitsPerSample', 16);
-
-    audiowrite( ...
-        strcat(outputFilepath, corruptedSignalFilename), ...
-        corruptedSignal, fs, 'BitsPerSample', 16);
-
-    disp("[INFO] Signals save correctlly.");
 
     %% Calculate P(z), S(z), Sh(z) and LMS output values
     % Get and apply dummy paths for calculate P(z) and S(z) values
@@ -118,28 +92,7 @@ function ancFeedforwardFxLMS
     disp("[INFO] Calculate FxLMS algorithm and output values done.");
 
     %% Report the result
-    figure
-    subplot(4,1,1)
-    plot(1:cntSample, desiredSignal)
-    ylabel('Amplitude');
-    xlabel('Discrete time k');
-    legend('Desired signal')
-    subplot(4,1,2)
-    plot(1:cntSample, corruptedSignal)
-    ylabel('Amplitude');
-    xlabel('Discrete time k');
-    legend('Corrupted signal')
-    subplot(4,1,3)
-    plot(1:cntSample, transferFuncSig) 
-    hold on 
-    plot(1:cntSample, transferFuncSig-errControlBuffer, 'r:')
-    ylabel('Amplitude');
-    xlabel('Discrete time k');
-    legend('Noise signal', 'Control signal')
-    subplot(4,1,4)
-    plot(1:cntSample, errControlBuffer)
-    ylabel('Amplitude');
-    xlabel('Discrete time k');
-    legend('Noise residue')
+    generateResultPlots(cntSample, desiredSignal, corruptedSignal, ...
+        transferFuncSig, errControlBuffer)
 
 end
