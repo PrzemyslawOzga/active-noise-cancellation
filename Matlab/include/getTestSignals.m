@@ -23,7 +23,7 @@ function [desiredSignal, corruptedSignal] = getTestSignals( ...
 
     % Finalize and save desired signal and corrupted signal
     disp("[INFO] Saving sequences.");
-    outputFilepath = './testSamples/';
+    outputFilepath = './signals/';
     desiredSignalFilename = strcat(outputDesiredSignalFilename + ".wav");
     corruptedSignalFilename = strcat(outputCorruptedSignalFilename + ".wav");
 

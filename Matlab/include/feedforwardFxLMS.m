@@ -93,10 +93,11 @@ function [feedforwardFxLMS] = feedforwardFxLMS
     disp("[INFO] Calculate FxLMS algorithm and output values done.");
 
     %% Report the result
-    getResultPlots(cntSample, desiredSignal, corruptedSignal, ...
-        transferFuncSig, errControlBuffer)
+    algorithmAndSystemName = "FeedforwardFxLMS";
+    getResultPlots(algorithmAndSystemName, cntSample, desiredSignal, ...
+        corruptedSignal, transferFuncSig, errControlBuffer)
 
     %% Finalize and save output data
-    finalizeAndSaveOutputData() % TO DO
+    % TO DO
 
 end

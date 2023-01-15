@@ -4,4 +4,8 @@
 % Project name: ANC using feedback and feedforward system
 % ************************************************************************/
 
-% TO DO
+function finalizeAndSaveOutputData
+
+    % TO DO
+
+end
