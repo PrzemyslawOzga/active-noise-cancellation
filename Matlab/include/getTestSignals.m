@@ -4,7 +4,8 @@
 % Project name: ANC using feedback and feedforward system
 % ************************************************************************/
 
-function [desiredSignal, corruptedSignal] = generateTestSignals
+function [desiredSignal, corruptedSignal] = getTestSignals( ...
+    outputDesiredSignalFilename, outputCorruptedSignalFilename)
 
     % Initialize parameters
     fs = 16000;
@@ -23,8 +24,8 @@ function [desiredSignal, corruptedSignal] = generateTestSignals
     % Finalize and save desired signal and corrupted signal
     disp("[INFO] Saving sequences.");
     outputFilepath = './testSamples/';
-    desiredSignalFilename = 'desiredSignal.wav';
-    corruptedSignalFilename = 'corruptedSignal.wav';
+    desiredSignalFilename = strcat(outputDesiredSignalFilename + ".wav");
+    corruptedSignalFilename = strcat(outputCorruptedSignalFilename + ".wav");
 
     audiowrite( ...
         strcat(outputFilepath, desiredSignalFilename), ...

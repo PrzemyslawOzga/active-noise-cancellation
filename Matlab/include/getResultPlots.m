@@ -4,7 +4,7 @@
 % Project name: ANC using feedback and feedforward system
 % ************************************************************************/
 
-function generateResultPlots(cntSample, desiredSignal, corruptedSignal, ...
+function getResultPlots(cntSample, desiredSignal, corruptedSignal, ...
     transferFuncSig, errControlBuffer)
 
     figure

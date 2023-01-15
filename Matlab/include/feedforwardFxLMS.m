@@ -25,17 +25,18 @@
 %
 % ************************************************************************/
 
-function ancFeedforwardFxLMS
-
-    addpath('./include');
+function [feedforwardFxLMS] = feedforwardFxLMS
 
     %% Generating and save desired and corrupted signal
-    [desiredSignal, corruptedSignal] = generateTestSignals;
+    outputDesiredSignalFilename = "deriredFeedforwardFxLMSSignal";
+    outputCorruptedSignalFilename = "corruptedFeedforwardFxLMSSignal";
+    [desiredSignal, corruptedSignal] = getTestSignals( ...
+        outputDesiredSignalFilename, outputCorruptedSignalFilename);
     cntSample = numel(desiredSignal);
 
     %% Calculate P(z), S(z), Sh(z) and LMS output values
     % Get and apply dummy paths for calculate P(z) and S(z) values
-    dummyPaths = [0.01 0.25 0.5 0.75 1 0.75 0.5 0.25 0.01] * 0.25;
+    dummyPaths = [0.01 0.25 0.5 0.75 1 0.75 0.5 0.25 0.01];
     dummyPathsForSdTransferFuncSig = dummyPaths * 0.25;
 
     disp("[INFO] Send corrupted signal to the actuator and measure " + ...
@@ -49,7 +50,7 @@ function ancFeedforwardFxLMS
     errIdentBuffer = zeros(1, cntSample);
 
     disp("[INFO] Apply and run LMS aglorithm.");
-    learningRate = 0.08;
+    learningRate = 0.01;
     for sampleIds = 1:cntSample
         estSdTransferFuncSigState = [ corruptedSignal(sampleIds) ...
             estSdTransferFuncSigState(1:15)];
@@ -75,7 +76,7 @@ function ancFeedforwardFxLMS
     fxlmsValuesState = zeros(1,16);
 
     disp("[INFO] Apply and run FxLMS aglorithm.");
-    learningRate=0.08;
+    learningRate=0.01;
     for sampleIds = 1:cntSample
         fxlmsState = [corruptedSignal(sampleIds) fxlmsState(1:15)];   
         fxlmsOutput = sum(fxlmsState .* fxlmsWeight);
@@ -92,7 +93,10 @@ function ancFeedforwardFxLMS
     disp("[INFO] Calculate FxLMS algorithm and output values done.");
 
     %% Report the result
-    generateResultPlots(cntSample, desiredSignal, corruptedSignal, ...
+    getResultPlots(cntSample, desiredSignal, corruptedSignal, ...
         transferFuncSig, errControlBuffer)
+
+    %% Finalize and save output data
+    finalizeAndSaveOutputData() % TO DO
 
 end
