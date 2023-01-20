@@ -43,13 +43,13 @@ function [results] = feedforwardFxLMS(learningRate, dummyPzPath, ...
 
     shzWeight = zeros(1, filterWeightsBufferSize);
     shzState = zeros(1, filterWeightsBufferSize);
-    identErrorLMS = zeros(1, signalLength);
+    identError = zeros(1, signalLength);
 
     for ids = 1:signalLength
         shzState = [xk(ids) shzState(1:127)];
         shzOutput = sum(shzState .* shzWeight);
-        identErrorLMS(ids) = ysk(ids) - shzOutput;
-        shzWeight = shzWeight + learningRate * identErrorLMS(ids) * shzState;
+        identError(ids) = ysk(ids) - shzOutput;
+        shzWeight = shzWeight + learningRate * identError(ids) * shzState;
     end
 
     % Calculate output anti-noise signal with FxLMS algorithm
@@ -57,18 +57,18 @@ function [results] = feedforwardFxLMS(learningRate, dummyPzPath, ...
     czState = zeros(1, filterWeightsBufferSize);
     szDummyState = zeros(size(dummySzPath));
     xkFiltered = zeros(1, filterWeightsBufferSize);
-    identErrorFxLMS = zeros(1, length(signalLength));
+    identError = zeros(1, signalLength);
 
     for ids = 1:signalLength
         czState = [xk(ids) czState(1:127)];   
         czOutput = sum(czState .* czWeight);
         szDummyState = [czOutput szDummyState(1:length(szDummyState) - 1)];
-        identErrorFxLMS(ids) = ypk(ids) - sum(szDummyState .* dummySzPath);
+        identError(ids) = ypk(ids) - sum(szDummyState .* dummySzPath);
         shzState = [xk(ids) shzState(1:127)];
         xkFiltered = [sum(shzState .* shzWeight) xkFiltered(1:127)];
-        czWeight = czWeight + learningRate * identErrorFxLMS(ids) * xkFiltered;
+        czWeight = czWeight + learningRate * identError(ids) * xkFiltered;
     end
 
     % Report the result
-    results.getFeedbackOutputResults(signalLength, ek, xk, ypk, identErrorFxLMS, identErrorLMS)
+    results.getFeedbackOutputResults(signalLength, ek, xk, ypk, identError)
 end

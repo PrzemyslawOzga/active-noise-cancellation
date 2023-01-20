@@ -8,12 +8,12 @@
 % cancellation system. Below is the sketch of the implemented system. 
 %
 %              +-----------+                       +   
-% x(k) ---+--->|     H     |--yp(k)----------------> sum --+---> e(k)
+% x(k) ---+--->|    P(z)   |--yp(k)----------------> sum --+---> e(k)
 %         |    +-----------+                          ^-   |
 %         |                                           |    |
 %         |        \                                  |    | 
 %         |    +-----------+                          |    |
-%         +--->|   W       |-------y(n)---------------+    |
+%         +--->|    LMS    |-------ys(k)--------------+    |
 %              +-----------+                               |
 %                       \                                  |
 %                        -------                           |
@@ -22,3 +22,25 @@
 %
 % ************************************************************************/
 
+function [results] = feedforwardLMS(learningRate, dummyPzPath, ...
+    ek, xk, algorithmAndSystemName)
+
+    disp(strcat("[INFO] Start " + algorithmAndSystemName));
+    signalLength = length(xk);
+    results = getPlotResults();
+
+    % Calculate input signal filtered by filter P(z) (primary path)
+    ypk = filter(dummyPzPath, 1, xk);
+
+    % Calculate LMS algorithm output anti-noise signal (ys(k))
+    lmsOutput = zeros(1, signalLength); 
+    identError = zeros(1, signalLength);
+
+    for ids = 1:signalLength
+        identError(ids) = xk(ids) - sum(lmsOutput(ids) .* xk(ids));
+        lmsOutput(ids + 1) = lmsOutput(ids) + learningRate * identError(ids) * xk(ids);
+    end
+
+    % Report the results
+    results.getFeedbackOutputResults(signalLength, ek, xk, ypk, identError)
+end
