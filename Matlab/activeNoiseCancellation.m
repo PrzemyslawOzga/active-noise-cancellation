@@ -10,8 +10,9 @@ function activeNoiseCancellation
 
     % Initialize parameters and dataset
     % We don't know P(z) - primary path - in reality. So we have to make dummy paths
-    dummyPzPath = [0.01 0.10 0.20 0.30 0.40 0.5 0.40 0.30 0.20 0.10 0.01]; 
+    dummyPzPath = [0.01 0.05 0.10 0.15 0.20 0.25 0.30 0.25 0.20 0.15 0.10 0.05 0.01]; 
     learningRate = 0.0025;
+    fs = 1000;
 
     disp("[INFO] Generate desired and input (corrupted) noise signal.");
     % Generate sine desired signal
@@ -25,13 +26,13 @@ function activeNoiseCancellation
     % Run LMS, FxLMS and FxRLS in feedforward and feedback systems
     disp("[INFO] Run active noise cancellation in LMS, FxLMS and FxRLS algorithm.");
     algorithmAndSystemName = "Feedforward LMS";
-    feedforwardLMS(learningRate, dummyPzPath, desiredSignal, inputSignal, algorithmAndSystemName);
+    feedforwardLMS(fs, learningRate, dummyPzPath, desiredSignal, inputSignal, algorithmAndSystemName);
 
     algorithmAndSystemName = "Feedforward FxLMS";
-    feedforwardFxLMS(learningRate, dummyPzPath, desiredSignal, inputSignal, algorithmAndSystemName);
+    feedforwardFxLMS(fs, learningRate, dummyPzPath, desiredSignal, inputSignal, algorithmAndSystemName);
 
-    algorithmAndSystemName = "Feedforward FxRLS";
-    feedforwardFxRLS();
+    %algorithmAndSystemName = "Feedforward FxRLS";
+    %feedforwardFxRLS();
 
     algorithmAndSystemName = "Feedback LMS";
     feedbackLMS();

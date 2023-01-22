@@ -25,7 +25,7 @@
 %
 % ************************************************************************/
 
-function [results] = feedforwardFxLMS(learningRate, dummyPzPath, ...
+function [results] = feedforwardFxLMS(fs, learningRate, dummyPzPath, ...
     ek, xk, algorithmAndSystemName)
 
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
@@ -72,5 +72,5 @@ function [results] = feedforwardFxLMS(learningRate, dummyPzPath, ...
     identError = filter(dummyPzPath, 1, identError);
 
     % Report the result
-    results.getFeedbackOutputResults(signalLength, ek, xk, ypk, identError)
+    results.getFeedbackOutputResults(algorithmAndSystemName, fs, signalLength, ek, xk, ypk, identError)
 end
