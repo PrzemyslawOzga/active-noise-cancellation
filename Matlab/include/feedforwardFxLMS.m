@@ -15,13 +15,13 @@
 %         |    +-----------+          +-----------+   |    |
 %         +--->|   C(z)    |--yw(k)-->|   S(z)    |---+    |
 %         |    +-----------+          +-----------+        |
-%         |            \                                   |
+%         |    Filter  \             Secondary path        |
 %         |             \----------------\                 |
 %         |                               \                |
 %         |    +-----------+          +-----------+        |
 %         +--->|   Sh(z)   |--xs(k)-->|    LMS    |<-------+
-%              +-----------+          +-----------+       
-%
+%              +-----------+          +-----------+     Error signal      
+%             Estimate of S(z)
 %
 % ************************************************************************/
 
@@ -63,11 +63,13 @@ function [results] = feedforwardFxLMS(learningRate, dummyPzPath, ...
         czState = [xk(ids) czState(1:127)];   
         czOutput = sum(czState .* czWeight);
         szDummyState = [czOutput szDummyState(1:length(szDummyState) - 1)];
-        identError(ids) = ypk(ids) - sum(szDummyState .* dummySzPath);
+        identError(ids) = xk(ids) - sum(szDummyState .* dummySzPath);
         shzState = [xk(ids) shzState(1:127)];
         xkFiltered = [sum(shzState .* shzWeight) xkFiltered(1:127)];
         czWeight = czWeight + learningRate * identError(ids) * xkFiltered;
     end
+
+    identError = filter(dummyPzPath, 1, identError);
 
     % Report the result
     results.getFeedbackOutputResults(signalLength, ek, xk, ypk, identError)

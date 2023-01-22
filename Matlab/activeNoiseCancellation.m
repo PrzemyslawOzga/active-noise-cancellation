@@ -11,7 +11,7 @@ function activeNoiseCancellation
     % Initialize parameters and dataset
     % We don't know P(z) - primary path - in reality. So we have to make dummy paths
     dummyPzPath = [0.01 0.10 0.20 0.30 0.40 0.5 0.40 0.30 0.20 0.10 0.01]; 
-    learningRate = 0.001;
+    learningRate = 0.0025;
 
     disp("[INFO] Generate desired and input (corrupted) noise signal.");
     % Generate sine desired signal

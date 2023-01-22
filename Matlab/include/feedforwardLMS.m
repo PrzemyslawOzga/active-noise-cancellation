@@ -15,9 +15,9 @@
 %         |    +-----------+                          |    |
 %         +--->|    LMS    |-------ys(k)--------------+    |
 %              +-----------+                               |
-%                       \                                  |
+%              Filter   \                                  |
 %                        -------                           |
-%                                \                         | 
+%                                \     Error signal        | 
 %                                  ------------------------+
 %
 % ************************************************************************/
@@ -40,6 +40,8 @@ function [results] = feedforwardLMS(learningRate, dummyPzPath, ...
         identError(ids) = xk(ids) - sum(lmsOutput(ids) .* xk(ids));
         lmsOutput(ids + 1) = lmsOutput(ids) + learningRate * identError(ids) * xk(ids);
     end
+
+    identError = filter(dummyPzPath, 1, identError);
 
     % Report the results
     results.getFeedbackOutputResults(signalLength, ek, xk, ypk, identError)
