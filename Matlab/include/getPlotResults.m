@@ -7,8 +7,8 @@
 classdef getPlotResults
 
     methods
-        function getFeedbackOutputResults(obj, name, fs, length, desired, ...
-                input, ypk, err)
+        function getFeedbackOutputResults(obj, name, fs, length, ...
+                desired, input, ypk, err)
         
             figure;
             time = linspace(0, length/fs, length);

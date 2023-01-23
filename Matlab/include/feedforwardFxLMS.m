@@ -25,22 +25,21 @@
 %
 % ************************************************************************/
 
-function [results] = feedforwardFxLMS(fs, learningRate, dummyPzPath, ...
-    ek, xk, algorithmAndSystemName)
+function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
+    dummyPzPath, ek, xk, algorithmAndSystemName)
 
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
     filterWeightsBufferSize = 128;
-    signalLength = length(xk);
     results = getPlotResults();
 
     % Calculate input signal filtered by filter P(z) (primary path)
     ypk = filter(dummyPzPath, 1, xk);
 
-    % Calculate secondary path signal Sh(z) using LMS algorithm
-    % We do not know S(z) in reality. So we have to make dummy paths
+    % Calculate secondary path signal Sh(z)
+    % We do not know S(z) in reality - so we have to make dummy paths.
     dummySzPath = dummyPzPath * 0.25;
     ysk = filter(dummySzPath, 1, xk);
-
+    
     shzWeight = zeros(1, filterWeightsBufferSize);
     shzState = zeros(1, filterWeightsBufferSize);
     identError = zeros(1, signalLength);
@@ -51,7 +50,7 @@ function [results] = feedforwardFxLMS(fs, learningRate, dummyPzPath, ...
         identError(ids) = ysk(ids) - shzOutput;
         shzWeight = shzWeight + learningRate * identError(ids) * shzState;
     end
-
+    
     % Calculate output anti-noise signal with FxLMS algorithm
     czWeight = zeros(1, filterWeightsBufferSize);
     czState = zeros(1, filterWeightsBufferSize);
@@ -72,5 +71,6 @@ function [results] = feedforwardFxLMS(fs, learningRate, dummyPzPath, ...
     identError = filter(dummyPzPath, 1, identError);
 
     % Report the result
-    results.getFeedbackOutputResults(algorithmAndSystemName, fs, signalLength, ek, xk, ypk, identError)
+    results.getFeedbackOutputResults(algorithmAndSystemName, fs, ...
+        signalLength, ek, xk, ypk, identError)
 end

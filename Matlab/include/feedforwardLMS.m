@@ -22,11 +22,10 @@
 %
 % ************************************************************************/
 
-function [results] = feedforwardLMS(fs, learningRate, dummyPzPath, ...
-    ek, xk, algorithmAndSystemName)
+function [results] = feedforwardLMS(fs, signalLength, learningRate, ...
+    dummyPzPath, ek, xk, algorithmAndSystemName)
 
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
-    signalLength = length(xk);
     results = getPlotResults();
 
     % Calculate input signal filtered by filter P(z) (primary path)
@@ -38,11 +37,13 @@ function [results] = feedforwardLMS(fs, learningRate, dummyPzPath, ...
 
     for ids = 1:signalLength
         identError(ids) = xk(ids) - sum(lmsOutput(ids) .* xk(ids));
-        lmsOutput(ids + 1) = lmsOutput(ids) + learningRate * identError(ids) * xk(ids);
+        lmsOutput(ids + 1) = lmsOutput(ids) + learningRate ...
+            * identError(ids) * xk(ids);
     end
 
     identError = filter(dummyPzPath, 1, identError);
 
     % Report the results
-    results.getFeedbackOutputResults(algorithmAndSystemName, fs, signalLength, ek, xk, ypk, identError)
+    results.getFeedbackOutputResults(algorithmAndSystemName, fs, ...
+        signalLength, ek, xk, ypk, identError)
 end
