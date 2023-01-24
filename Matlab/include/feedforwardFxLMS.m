@@ -26,10 +26,9 @@
 % ************************************************************************/
 
 function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
-    dummyPzPath, ek, xk, algorithmAndSystemName)
+    dummyPzPath, bufferSize, xk, algorithmAndSystemName)
 
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
-    filterWeightsBufferSize = 128;
     results = getPlotResults();
 
     % Calculate input signal filtered by filter P(z) (primary path)
@@ -39,38 +38,45 @@ function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
     % We do not know S(z) in reality - so we have to make dummy paths.
     dummySzPath = dummyPzPath * 0.25;
     ysk = filter(dummySzPath, 1, xk);
+
+    % Make sure that signals are column vectors
+    xk = xk(:);
+    ypk = ypk(:);
+    ysk = ysk(:);
     
-    shzWeight = zeros(1, filterWeightsBufferSize);
-    shzState = zeros(1, filterWeightsBufferSize);
+    shz = zeros(bufferSize, 1);
+    tempLearningRate = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
 
-    for ids = 1:signalLength
-        shzState = [xk(ids) shzState(1:127)];
-        shzOutput = sum(shzState .* shzWeight);
-        identError(ids) = ysk(ids) - shzOutput;
-        shzWeight = shzWeight + learningRate * identError(ids) * shzState;
+    for ids = bufferSize:signalLength
+        coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
+        tempLearningRate(ids) = learningRate;
+        identError(ids) = ysk(ids) - shz' * coeffBuffer;
+        shz = shz + tempLearningRate(ids) * coeffBuffer * identError(ids);
     end
+    shz = abs(ifft(1./abs(fft(shz))));
     
     % Calculate output anti-noise signal with FxLMS algorithm
-    czWeight = zeros(1, filterWeightsBufferSize);
-    czState = zeros(1, filterWeightsBufferSize);
-    szDummyState = zeros(size(dummySzPath));
-    xkFiltered = zeros(1, filterWeightsBufferSize);
+    lmsOutputSignal = filter(shz, 1, xk);
+    fxlmsOutput = zeros(bufferSize, 1);
+    tempLearningRate = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
 
-    for ids = 1:signalLength
-        czState = [xk(ids) czState(1:127)];   
-        czOutput = sum(czState .* czWeight);
-        szDummyState = [czOutput szDummyState(1:length(szDummyState) - 1)];
-        identError(ids) = xk(ids) - sum(szDummyState .* dummySzPath);
-        shzState = [xk(ids) shzState(1:127)];
-        xkFiltered = [sum(shzState .* shzWeight) xkFiltered(1:127)];
-        czWeight = czWeight + learningRate * identError(ids) * xkFiltered;
+    for ids = bufferSize:signalLength
+        coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
+        sdPathCoeffBuffer = lmsOutputSignal(ids:-1:ids - bufferSize + 1);
+        tempLearningRate(ids) = learningRate;
+        identError(ids) = ypk(ids) - fxlmsOutput' * coeffBuffer;
+        fxlmsOutput = fxlmsOutput + tempLearningRate(ids) ...
+            * sdPathCoeffBuffer * identError(ids);
     end
 
-    identError = filter(dummyPzPath, 1, identError);
+    % Make sure that output error signal are column vectors
+    identError = identError(:);
 
     % Report the result
     results.getFeedbackOutputResults(algorithmAndSystemName, fs, ...
-        signalLength, ek, xk, ypk, identError)
+        signalLength, xk, ypk, identError)
+    results.compareOutputSignalsForEachAlgorithms( ...
+        algorithmAndSystemName, fs, signalLength, ypk, identError);
 end
