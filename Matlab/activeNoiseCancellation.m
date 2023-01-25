@@ -45,7 +45,8 @@ function activeNoiseCancellation(varargin)
         % Make sure that signals are column vectors
         inputSignal = inputSignal(:);
     
-        %% Run LMS, FxLMS and FxRLS in feedforward and feedback systems
+        %% Run LMS, FxLMS, NLMS and FxNLMS in feedforward and feedback 
+        %% systems
         disp("[INFO] Run active noise cancellation in LMS, FxLMS, " + ...
             "NLMS and FxNLMS algorithm.");
         
