@@ -46,8 +46,8 @@ function activeNoiseCancellation(varargin)
         inputSignal = inputSignal(:);
     
         %% Run LMS, FxLMS and FxRLS in feedforward and feedback systems
-        disp("[INFO] Run active noise cancellation in LMS, FxLMS " + ...
-            "and FxRLS algorithm.");
+        disp("[INFO] Run active noise cancellation in LMS, FxLMS, " + ...
+            "NLMS and FxNLMS algorithm.");
         
         tic
             algorithmAndSystemName = "Feedforward LMS";
