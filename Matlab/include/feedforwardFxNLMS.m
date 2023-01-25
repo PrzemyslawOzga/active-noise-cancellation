@@ -26,7 +26,7 @@
 % ************************************************************************/
 
 function [results] = feedforwardFxNLMS(fs, signalLength, learningRate, ...
-    dummyPzPath, bufferSize, xk, algorithmAndSystemName)
+    dummyPzPath, bufferSize, xk, algorithmAndSystemName, mode)
 
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
     results = getPlotResults();
@@ -47,11 +47,17 @@ function [results] = feedforwardFxNLMS(fs, signalLength, learningRate, ...
     tempLearningRate = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
 
-    for ids = bufferSize:signalLength
-        coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
-        tempLearningRate(ids) = 1 / (coeffBuffer' * coeffBuffer);
-        identError(ids) = ysk(ids) - shz' * coeffBuffer;
-        shz = shz + tempLearningRate(ids) * coeffBuffer * identError(ids);
+    try
+        for ids = bufferSize:signalLength
+            coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
+            tempLearningRate(ids) = 1 / (coeffBuffer' * coeffBuffer);
+            identError(ids) = ysk(ids) - shz' * coeffBuffer;
+            shz = shz + tempLearningRate(ids) * coeffBuffer * identError(ids);
+        end
+    catch
+        error(strcat("Error in ", algorithmAndSystemName, ": " + ...
+            "The value of the secondary signal transfer function " + ...
+            "cannot be estimated. "));
     end
     shz = abs(ifft(1./abs(fft(shz))));
     
@@ -61,21 +67,28 @@ function [results] = feedforwardFxNLMS(fs, signalLength, learningRate, ...
     tempLearningRate = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
 
-    for ids = bufferSize:signalLength
-        coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
-        sdPathCoeffBuffer = lmsOutputSignal(ids:-1:ids - bufferSize + 1);
-        tempLearningRate(ids) = learningRate / (coeffBuffer' * coeffBuffer);
-        identError(ids) = ypk(ids) - fxlmsOutput' * coeffBuffer;
-        fxlmsOutput = fxlmsOutput + tempLearningRate(ids) ...
-            * sdPathCoeffBuffer * identError(ids);
+    try
+        for ids = bufferSize:signalLength
+            coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
+            sdPathCoeffBuffer = lmsOutputSignal(ids:-1:ids - bufferSize + 1);
+            tempLearningRate(ids) = learningRate / (coeffBuffer' * coeffBuffer);
+            identError(ids) = ypk(ids) - fxlmsOutput' * coeffBuffer;
+            fxlmsOutput = fxlmsOutput + tempLearningRate(ids) ...
+                * sdPathCoeffBuffer * identError(ids);
+        end
+    catch
+        error(strcat("Error in ", algorithmAndSystemName, ": " + ...
+            "The value of the identification error cannot be estimated. "));
     end
 
     % Make sure that output error signal are column vectors
     identError = identError(:);
 
     % Report the result
-    results.getFeedbackOutputResults(algorithmAndSystemName, fs, ...
-        signalLength, xk, ypk, identError)
-    results.compareOutputSignalsForEachAlgorithms( ...
-        algorithmAndSystemName, fs, signalLength, ypk, identError);
+    if true(mode)
+        results.getFeedbackOutputResults(algorithmAndSystemName, fs, ...
+            signalLength, xk, ypk, identError)
+        results.compareOutputSignalsForEachAlgorithms( ...
+            algorithmAndSystemName, fs, signalLength, ypk, identError);
+    end
 end

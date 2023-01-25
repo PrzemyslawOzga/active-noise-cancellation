@@ -4,67 +4,122 @@
 % Project name: ANC using feedback and feedforward system
 % ************************************************************************/
 
-function activeNoiseCancellation
+function activeNoiseCancellation(varargin)
 
-    addpath("./include/")
+    try
+        %% User input validation and preparation
+        for argument = varargin
+            if strcmpi(argument, '-h') || strcmpi(argument, '--help')
+                printHelp();
+                return
+            end
 
-    %% Initialize parameters and dataset
-    % We don't know P(z) - primary path - in reality. So we have 
-    % to make dummy paths
-    filterWeightsBufferSize = 128;
-    dummyPzPath = 0.25 * randn(filterWeightsBufferSize, 1); 
-    learningRate = 0.01;
-    fs = 1000;
+            if strcmpi(argument, 'true')
+                mode = true;
+            elseif strcmpi(argument, 'false')
+                mode = false;
+            else
+                disp('Wrong input arguments.');
+                printHelp();
+                return
+            end
+        end
 
-    % Generate input corrupted signal
-    inputSignal = randn(25000,1);
-    inputSignal = inputSignal/max(inputSignal);
-    signalLength = length(inputSignal);
-
-    % Make sure that signals are column vectors
-    inputSignal = inputSignal(:);
-
-    %% Run LMS, FxLMS and FxRLS in feedforward and feedback systems
-    disp("[INFO] Run active noise cancellation in LMS, FxLMS and " + ...
-        "FxRLS algorithm.");
+        if (~isdeployed)
+            addpath("./include/")
+        end
     
-    algorithmAndSystemName = "Feedforward LMS";
-    feedforwardLMS( ...
-        fs, signalLength, learningRate, dummyPzPath, ...
-        filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
+        %% Initialize parameters and dataset
+        % We don't know P(z) - primary path - in reality. So we have 
+        % to make dummy paths
+        filterWeightsBufferSize = 128;
+        dummyPzPath = 0.25 * randn(filterWeightsBufferSize, 1); 
+        learningRate = 0.01;
+        fs = 1000;
+    
+        % Generate input corrupted signal
+        inputSignal = randn(50000, 1);
+        inputSignal = inputSignal/max(inputSignal);
+        signalLength = length(inputSignal);
+    
+        % Make sure that signals are column vectors
+        inputSignal = inputSignal(:);
+    
+        %% Run LMS, FxLMS and FxRLS in feedforward and feedback systems
+        disp("[INFO] Run active noise cancellation in LMS, FxLMS " + ...
+            "and FxRLS algorithm.");
+        
+        tic
+            algorithmAndSystemName = "Feedforward LMS";
+            feedforwardLMS( ...
+                fs, signalLength, learningRate, dummyPzPath, ...
+                filterWeightsBufferSize, inputSignal, ...
+                algorithmAndSystemName, mode);
+        toc
+    
+        tic
+        algorithmAndSystemName = "Feedforward FxLMS";
+        feedforwardFxLMS( ...
+            fs, signalLength, learningRate, dummyPzPath, ...
+            filterWeightsBufferSize, inputSignal, ...
+            algorithmAndSystemName, mode);
+        toc
 
-    algorithmAndSystemName = "Feedforward FxLMS";
-    feedforwardFxLMS( ...
-        fs, signalLength, learningRate, dummyPzPath, ...
-        filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
+        tic
+        algorithmAndSystemName = "Feedforward NLMS";
+        feedforwardNLMS( ...
+            fs, signalLength, learningRate, dummyPzPath, ...
+            filterWeightsBufferSize, inputSignal, ...
+            algorithmAndSystemName, mode);
+        toc
+    
+        tic;
+        algorithmAndSystemName = "Feedforward FxNLMS";
+        feedforwardFxNLMS( ...
+            fs, signalLength, learningRate, dummyPzPath, ...
+            filterWeightsBufferSize, inputSignal, ...
+            algorithmAndSystemName, mode);
+        toc
+    
+        %tic
+            %algorithmAndSystemName = "Feedback LMS";
+            %feedbackLMS();
+        %toc
+    
+        %tic
+            %algorithmAndSystemName = "Feedback FxLMS";
+            %feedbackFxLMS();
+        %toc
 
-    algorithmAndSystemName = "Feedforward NLMS";
-    feedforwardNLMS( ...
-        fs, signalLength, learningRate, dummyPzPath, ...
-        filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
+        %tic
+            %algorithmAndSystemName = "Feedback NLMS";
+            %feedbackNLMS();
+        %toc
 
-    algorithmAndSystemName = "Feedforward FxNLMS";
-    feedforwardFxNLMS( ...
-        fs, signalLength, learningRate, dummyPzPath, ...
-        filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
+        %tic
+            %algorithmAndSystemName = "Feedback FxNLMS";
+            %feedbackFxNLMS();
+        %toc
+    
+        disp("[INFO] Simulation of noise cancellation done.");
+    
+        %% Results summary
+        feedforwardystemName = "feedforward";
+        feedbackSystemName = "feedback";
+        disp("[INFO] Generate comparison of output error signal " + ...
+            "between all algorithms.");
+    
+        % To do
 
-    %algorithmAndSystemName = "Feedback LMS";
-    %feedbackLMS();
+    catch ME
+        rethrow(ME)
+    end
+end
 
-    %algorithmAndSystemName = "Feedback FxLMS";
-    %feedbackFxLMS();
-
-    %algorithmAndSystemName = "Feedback NLMS";
-    %feedbackNLMS();
-
-    %algorithmAndSystemName = "Feedback FxNLMS";
-    %feedbackFxNLMS();
-
-    disp("[INFO] Simulation of noise cancellation done.");
-
-    %% Results summary
-    disp("[INFO] Generate comparison of output error signal between " + ...
-        "all algorithms.");
-
-    % To do
+function printHelp()
+    disp("  Usage:");
+    disp("    activeNoiseCancellation([mode: [true, false]])");
+    disp("  Usage example:");
+    disp("    activeNoiseCancellation('false') -> without debug mode");
+    disp("    activeNoiseCancellation('true') -> with debug mode");
 end

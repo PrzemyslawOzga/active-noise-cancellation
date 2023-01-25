@@ -42,8 +42,8 @@ classdef getPlotResults
             legend('Noise residue')
         end
 
-        function compareOutputSignalsForEachAlgorithms(obj, name, fs, ...
-                length, ypk, err)
+        function compareOutputSignalsForEachAlgorithms( ...
+                obj, name, fs, length, ypk, err)
         
             figure;
             time = linspace(0, length/fs, length);
@@ -59,6 +59,16 @@ classdef getPlotResults
             xlabel('Time (s)');
             ylim([-2.5 2.5]);
             legend('Measurement error signal', 'Output residue signal')
+        end
+
+        function compareResultsFromAllAlgorithmsForEachSystems()
+        
+            % to do - this plots has been in main function
+        end
+
+        function compareResultsFromAllSystemsForEachAlgorithms()
+        
+            % to do - this plots has been in main function
         end
     end
 end
