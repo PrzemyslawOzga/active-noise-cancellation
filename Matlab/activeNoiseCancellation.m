@@ -11,8 +11,8 @@ function activeNoiseCancellation
     %% Initialize parameters and dataset
     % We don't know P(z) - primary path - in reality. So we have 
     % to make dummy paths
-    dummyPzPath = 0.25 * randn(128,1); 
     filterWeightsBufferSize = 128;
+    dummyPzPath = 0.25 * randn(filterWeightsBufferSize, 1); 
     learningRate = 0.01;
     fs = 1000;
 
@@ -20,6 +20,9 @@ function activeNoiseCancellation
     inputSignal = randn(25000,1);
     inputSignal = inputSignal/max(inputSignal);
     signalLength = length(inputSignal);
+
+    % Make sure that signals are column vectors
+    inputSignal = inputSignal(:);
 
     %% Run LMS, FxLMS and FxRLS in feedforward and feedback systems
     disp("[INFO] Run active noise cancellation in LMS, FxLMS and " + ...
@@ -40,10 +43,10 @@ function activeNoiseCancellation
         fs, signalLength, learningRate, dummyPzPath, ...
         filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
 
-    %algorithmAndSystemName = "Feedforward FxNLMS";
-    %feedforwardFxNLMS( ...
-    %    fs, signalLength, learningRate, dummyPzPath, ...
-    %    filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
+    algorithmAndSystemName = "Feedforward FxNLMS";
+    feedforwardFxNLMS( ...
+        fs, signalLength, learningRate, dummyPzPath, ...
+        filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
 
     %algorithmAndSystemName = "Feedback LMS";
     %feedbackLMS();

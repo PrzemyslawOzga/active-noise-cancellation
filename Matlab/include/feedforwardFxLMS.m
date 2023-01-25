@@ -40,7 +40,6 @@ function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
     ysk = filter(dummySzPath, 1, xk);
 
     % Make sure that signals are column vectors
-    xk = xk(:);
     ypk = ypk(:);
     ysk = ysk(:);
     

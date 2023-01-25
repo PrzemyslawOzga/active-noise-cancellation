@@ -32,7 +32,6 @@ function [results] = feedforwardNLMS(fs, signalLength, learningRate, ...
     ypk = filter(dummyPzPath, 1, xk);
 
     % Make sure that signals are column vectors
-    xk = xk(:);
     ypk = ypk(:);
 
     % Calculate NLMS algorithm output anti-noise signal (ys(k))

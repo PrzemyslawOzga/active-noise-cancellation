@@ -32,7 +32,6 @@ function [results] = feedforwardLMS(fs, signalLength, learningRate, ...
     ypk = filter(dummyPzPath, 1, xk);
 
     % Make sure that signals are column vectors
-    xk = xk(:);
     ypk = ypk(:);
 
     % Calculate LMS algorithm output anti-noise signal (ys(k))
