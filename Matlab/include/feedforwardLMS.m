@@ -15,7 +15,7 @@
 %         |    +-----------+                          |    |
 %         +--->|    LMS    |-------ys(k)--------------+    |
 %              +-----------+                               |
-%              Filter   \                                  |
+%                       \                                  |
 %                        -------                           |
 %                                \     Error signal        | 
 %                                  ------------------------+
@@ -43,7 +43,7 @@ function [results] = feedforwardLMS(fs, signalLength, learningRate, ...
     for ids = bufferSize:signalLength
         coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
         tempLearningRate(ids) = learningRate;
-        identError(ids) = ypk(ids) - sum(lmsOutput' * coeffBuffer);
+        identError(ids) = ypk(ids) - sum(lmsOutput .* coeffBuffer);
         lmsOutput = lmsOutput + tempLearningRate(ids) * coeffBuffer ...
             * identError(ids);
     end

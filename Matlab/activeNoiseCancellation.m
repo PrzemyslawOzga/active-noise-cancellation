@@ -40,6 +40,11 @@ function activeNoiseCancellation
         fs, signalLength, learningRate, dummyPzPath, ...
         filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
 
+    %algorithmAndSystemName = "Feedforward FxNLMS";
+    %feedforwardFxNLMS( ...
+    %    fs, signalLength, learningRate, dummyPzPath, ...
+    %    filterWeightsBufferSize, inputSignal, algorithmAndSystemName);
+
     %algorithmAndSystemName = "Feedback LMS";
     %feedbackLMS();
 
@@ -49,14 +54,12 @@ function activeNoiseCancellation
     %algorithmAndSystemName = "Feedback NLMS";
     %feedbackNLMS();
 
+    %algorithmAndSystemName = "Feedback FxNLMS";
+    %feedbackFxNLMS();
+
     disp("[INFO] Simulation of noise cancellation done.");
 
     %% Results summary
-    disp("[INFO] Generate comparison of output error signal for " + ...
-        "each algorithms.");
-
-    % To do
-
     disp("[INFO] Generate comparison of output error signal between " + ...
         "all algorithms.");
 
