@@ -32,9 +32,9 @@ function activeNoiseCancellation(varargin)
         %% Initialize parameters and dataset
         % We don't know P(z) - primary path - in reality. So we have 
         % to make dummy paths
-        filterWeightsBufferSize = 128;
+        filterWeightsBufferSize = 128; % Filter buffer size
         dummyPzPath = 0.25 * randn(filterWeightsBufferSize, 1); 
-        learningRate = 0.01;
+        learningRate = 0.01; % Adaptation step
         fs = 1000;
     
         % Generate input corrupted signal
