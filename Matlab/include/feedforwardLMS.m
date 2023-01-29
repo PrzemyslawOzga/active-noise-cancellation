@@ -41,11 +41,11 @@ function [results] = feedforwardLMS(fs, signalLength, learningRate, ...
 
     try
         for ids = bufferSize:signalLength
-            coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
+            identErrorBuffer = xk(ids:-1:ids - bufferSize + 1);
             tempLearningRate(ids) = learningRate;
-            identError(ids) = ypk(ids) - sum(lmsOutput .* coeffBuffer);
-            lmsOutput = lmsOutput + tempLearningRate(ids) * coeffBuffer ...
-                * identError(ids);
+            identError(ids) = ypk(ids) - sum(lmsOutput .* identErrorBuffer);
+            lmsOutput = lmsOutput + tempLearningRate(ids) ...
+                * identErrorBuffer * identError(ids);
         end
     catch
         error(strcat("Error in ", algorithmAndSystemName, ": " + ...

@@ -49,10 +49,10 @@ function [results] = feedforwardFxNLMS(fs, signalLength, learningRate, ...
 
     try
         for ids = bufferSize:signalLength
-            coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
-            tempLearningRate(ids) = 1 / (coeffBuffer' * coeffBuffer);
-            identError(ids) = ysk(ids) - shz' * coeffBuffer;
-            shz = shz + tempLearningRate(ids) * coeffBuffer * identError(ids);
+            estimateBuffer = xk(ids:-1:ids - bufferSize + 1);
+            tempLearningRate(ids) = 1 / (estimateBuffer' * estimateBuffer);
+            identError(ids) = ysk(ids) - shz' * estimateBuffer;
+            shz = shz + tempLearningRate(ids) * estimateBuffer * identError(ids);
         end
     catch
         error(strcat("Error in ", algorithmAndSystemName, ": " + ...
@@ -69,10 +69,10 @@ function [results] = feedforwardFxNLMS(fs, signalLength, learningRate, ...
 
     try
         for ids = bufferSize:signalLength
-            coeffBuffer = xk(ids:-1:ids - bufferSize + 1);
+            identErrorBuffer = xk(ids:-1:ids - bufferSize + 1);
             sdPathCoeffBuffer = lmsOutputSignal(ids:-1:ids - bufferSize + 1);
-            tempLearningRate(ids) = learningRate / (coeffBuffer' * coeffBuffer);
-            identError(ids) = ypk(ids) - fxlmsOutput' * coeffBuffer;
+            tempLearningRate(ids) = learningRate / (identErrorBuffer' * identErrorBuffer);
+            identError(ids) = ypk(ids) - fxlmsOutput' * identErrorBuffer;
             fxlmsOutput = fxlmsOutput + tempLearningRate(ids) ...
                 * sdPathCoeffBuffer * identError(ids);
         end
