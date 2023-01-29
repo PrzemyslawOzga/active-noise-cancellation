@@ -13,10 +13,18 @@ The implementation took place for the purposes of the engineering thesis.
 
 Diagrams of the algorithms described above are shown below in a feed-forward system.
 
+#### LMS - Least Mean Squares algorithm
+
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_LMS.png)
+
+#### Filtered-X Least Mean Squares algorithm
 
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_FxLMS.png)
 
+#### Normalized Least Mean Squares algorithm
+
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_NLMS.png)
+
+#### Filtered-X Normalized Least Mean Squares algorithm
 
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_FxNLMS.png)
