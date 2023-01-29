@@ -32,13 +32,15 @@ function [results] = feedforwardLMS(fs, signalLength, learningRate, ...
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
     results = getPlotResults();
 
-    % Calculate input signal filtered by filter P(z) (primary path)
+    % Calculate the signal filtered by the P(z) filter, which receives 
+    % the excitation signal at the input and the response signal at 
+    % the output
     ypk = filter(dummyPzPath, 1, xk);
 
     % Make sure that signals are column vectors
     ypk = ypk(:);
 
-    % Calculate LMS algorithm output anti-noise signal (ys(k))
+    % Calculate and generate LMS algorithm output signal (ys(k))
     lmsOutput = zeros(bufferSize, 1);
     tempLearningRate = zeros(1, bufferSize);
     identError = zeros(1, signalLength);

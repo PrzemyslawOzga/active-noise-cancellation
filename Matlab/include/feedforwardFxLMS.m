@@ -35,11 +35,13 @@ function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
     results = getPlotResults();
 
-    % Calculate input signal filtered by filter P(z) (primary path)
+    % Calculate the signal filtered by the P(z) filter, which receives 
+    % the excitation signal at the input and the response signal at 
+    % the output
     ypk = filter(dummyPzPath, 1, xk);
 
-    % Calculate secondary path signal Sh(z)
-    % We do not know S(z) in reality - so we have to make dummy paths.
+    % Calculate secondary path signal Sh(z). We do not know S(z) in 
+    % reality - so we have to make dummy paths.
     dummySzPath = dummyPzPath * 0.25;
     ysk = filter(dummySzPath, 1, xk);
 
@@ -56,7 +58,8 @@ function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
             estimateBuffer = xk(ids:-1:ids - bufferSize + 1);
             tempLearningRate(ids) = learningRate;
             identError(ids) = ysk(ids) - shz' * estimateBuffer;
-            shz = shz + tempLearningRate(ids) * estimateBuffer * identError(ids);
+            shz = shz + tempLearningRate(ids) * estimateBuffer ...
+                * identError(ids);
         end
     catch
         error(strcat("Error in ", algorithmAndSystemName, ": " + ...
@@ -65,7 +68,7 @@ function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
     end
     shz = abs(ifft(1./abs(fft(shz))));
     
-    % Calculate output anti-noise signal with FxLMS algorithm
+    % Calculate and generate output signal with FxLMS algorithm
     lmsOutputSignal = filter(shz, 1, xk);
     fxlmsOutput = zeros(bufferSize, 1);
     tempLearningRate = zeros(1, bufferSize);

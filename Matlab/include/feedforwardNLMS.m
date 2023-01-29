@@ -32,13 +32,15 @@ function [results] = feedforwardNLMS(fs, signalLength, learningRate, ...
     disp(strcat("[INFO] Start " + algorithmAndSystemName));
     results = getPlotResults();
 
-    % Calculate input signal filtered by filter P(z) (primary path)
+    % Calculate the signal filtered by the P(z) filter, which receives 
+    % the excitation signal at the input and the response signal at 
+    % the output
     ypk = filter(dummyPzPath, 1, xk);
 
     % Make sure that signals are column vectors
     ypk = ypk(:);
 
-    % Calculate NLMS algorithm output anti-noise signal (ys(k))
+    % Calculate and generate LMS algorithm output signal (ys(k))
     nlmsOutput = zeros(bufferSize, 1);
     tempLearningRate = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
@@ -46,8 +48,10 @@ function [results] = feedforwardNLMS(fs, signalLength, learningRate, ...
     try
         for ids = bufferSize:signalLength
             identErrorBuffer = xk(ids:-1:ids - bufferSize + 1);
-            tempLearningRate(ids) = learningRate / (identErrorBuffer' * identErrorBuffer);
-            identError(ids) = ypk(ids) - sum(nlmsOutput' * identErrorBuffer);
+            tempLearningRate(ids) = learningRate / (identErrorBuffer' ...
+                * identErrorBuffer);
+            identError(ids) = ypk(ids) - sum(nlmsOutput' ...
+                * identErrorBuffer);
             nlmsOutput = nlmsOutput + tempLearningRate(ids) ...
                 * identErrorBuffer * identError(ids);
         end
