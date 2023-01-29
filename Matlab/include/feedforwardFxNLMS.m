@@ -7,6 +7,10 @@
 % Below is implemented of FxNLMS algorithm with feedforward active noise
 % cancellation system. Below is the sketch of the implemented system. 
 %
+% In the solution below, the second transfer path is estimated at Sh(z). 
+% Thanks to this, the FxNLMS algorithm assumes the effects of the 
+% secondary path.
+%
 %              +-----------+                       +   
 % x(k) ---+--->|   P(z)    |--yp(k)----------------> sum --+---> e(k)
 %         |    +-----------+                          ^-   |

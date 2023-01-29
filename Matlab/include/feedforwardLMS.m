@@ -5,16 +5,20 @@
 %
 % Project description:
 % Below is implemented of LMS algorithm with feedforward active noise
-% cancellation system. Below is the sketch of the implemented system. 
+% cancellation system. Below is the sketch of the implemented system.
+%
+% In the following solution, the second transfer path is not estimated 
+% in any way. It occurs in the solution of the system, but does not 
+% assume a secondary path.
 %
 %              +-----------+                       +   
 % x(k) ---+--->|    P(z)   |--yp(k)----------------> sum --+---> e(k)
 %         |    +-----------+                          ^-   |
 %         |                                           |    |
-%         |        \                                  |    | 
-%         |    +-----------+                          |    |
-%         +--->|    LMS    |-------ys(k)--------------+    |
-%              +-----------+                               |
+%         |        \                                ys(k)  | 
+%         |    +-----------+            +-------+     |    |
+%         +--->|    LMS    |---yw(k)----|  S(z) |-----+    |
+%              +-----------+            +-------+          |
 %                       \                                  |
 %                        -------                           |
 %                                \     Error signal        | 
