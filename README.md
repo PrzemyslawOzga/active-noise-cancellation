@@ -11,20 +11,36 @@ The implementation of the above systems for active noise cancellation methods wa
 The implementation of the above systems and algorithms was fully implemented in the MATLAB programming language, version 2022b. 
 The implementation took place for the purposes of the engineering thesis.
 
-Diagrams of the algorithms described above are shown below in a feed-forward system.
+Diagrams of the algorithms described above are shown below.
 
-#### LMS - Least Mean Squares algorithm
+#### LMS - Least Mean Squares algorithm in feed-forward system
 
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_LMS.png)
 
-#### Filtered-X Least Mean Squares algorithm
+#### Filtered-X Least Mean Squares algorithm in feed-forward system
 
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_FxLMS.png)
 
-#### Normalized Least Mean Squares algorithm
+#### Normalized Least Mean Squares algorithm in feed-forward system
 
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_NLMS.png)
 
-#### Filtered-X Normalized Least Mean Squares algorithm
+#### Filtered-X Normalized Least Mean Squares algorithm in feed-forward system
 
 ![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/ff_FxNLMS.png)
+
+#### LMS - Least Mean Squares algorithm in feedback system
+
+![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/fb_LMS.png)
+
+#### Filtered-X Least Mean Squares algorithm in feedback system
+
+![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/fb_FxLMS.png)
+
+#### Normalized Least Mean Squares algorithm in feedback system
+
+![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/fb_NLMS.png)
+
+#### Filtered-X Normalized Least Mean Squares algorithm in feedback system
+
+![alt text](https://github.com/PrzemyslawOzga/ActiveNoiseCancellation/blob/main/Graphics/fb_FxNLMS.png)
