@@ -29,63 +29,38 @@
 %
 % ************************************************************************/
 
-function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
-    dummyPzPath, bufferSize, xk, algorithmAndSystemName, mode)
+function [results] = feedforwardFxLMS(signal, length, pzFilteredSig, ...
+    szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
 
-    disp(strcat("[INFO] Start " + algorithmAndSystemName));
-    results = getPlotResults();
+    disp(strcat("[INFO] Start " + testCaseName));
 
-    % Calculate the signal filtered by the P(z) filter, which receives 
-    % the excitation signal at the input and the response signal at 
-    % the output
-    ypk = filter(dummyPzPath, 1, xk);
+    % Calculate secondary path signal Sh(z). 
+    shzEstimate = zeros(bufferSize, 1);
+    tempAdaptationStep = zeros(1, bufferSize);
+    identError = zeros(1, length);
 
-    % Calculate secondary path signal Sh(z). We do not know S(z) in 
-    % reality - so we have to make dummy paths.
-    dummySzPath = dummyPzPath * 0.25;
-    ysk = filter(dummySzPath, 1, xk);
-
-    % Make sure that signals are column vectors
-    ypk = ypk(:);
-    ysk = ysk(:);
-    
-    shz = zeros(bufferSize, 1);
-    tempLearningRate = zeros(1, bufferSize);
-    identError = zeros(1, signalLength);
-
-    try
-        for ids = bufferSize:signalLength
-            estimateBuffer = xk(ids:-1:ids - bufferSize + 1);
-            tempLearningRate(ids) = learningRate;
-            identError(ids) = ysk(ids) - shz' * estimateBuffer;
-            shz = shz + tempLearningRate(ids) * estimateBuffer ...
-                * identError(ids);
-        end
-    catch
-        error(strcat("Error in ", algorithmAndSystemName, ": " + ...
-            "The value of the secondary signal transfer function " + ...
-            "cannot be estimated. "));
+    for ids = bufferSize:length
+        estimateBuffer = signal(ids:-1:ids - bufferSize + 1);
+        tempAdaptationStep(ids) = adaptationStep;
+        identError(ids) = szFilteredSig(ids) - shzEstimate' * estimateBuffer;
+        shzEstimate = ...
+            shzEstimate + tempAdaptationStep(ids) * estimateBuffer * identError(ids);
     end
-    shz = abs(ifft(1./abs(fft(shz))));
+    shzEstimate = abs(ifft(1./abs(fft(shzEstimate))));
     
     % Calculate and generate output signal with FxLMS algorithm
-    lmsOutputSignal = filter(shz, 1, xk);
+    lmsOutputSignal = filter(shzEstimate, 1, signal);
     fxlmsOutput = zeros(bufferSize, 1);
-    tempLearningRate = zeros(1, bufferSize);
-    identError = zeros(1, signalLength);
+    tempAdaptationStep = zeros(1, bufferSize);
+    identError = zeros(1, length);
 
-    try
-        for ids = bufferSize:signalLength
-            identErrorBuffer = xk(ids:-1:ids - bufferSize + 1);
-            sdPathCoeffBuffer = lmsOutputSignal(ids:-1:ids - bufferSize + 1);
-            tempLearningRate(ids) = learningRate;
-            identError(ids) = ypk(ids) - fxlmsOutput' * identErrorBuffer;
-            fxlmsOutput = fxlmsOutput + tempLearningRate(ids) ...
-                * sdPathCoeffBuffer * identError(ids);
-        end
-    catch
-        error(strcat("Error in ", algorithmAndSystemName, ": " + ...
-            "The value of the identification error cannot be estimated. "));
+    for ids = bufferSize:length
+        identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
+        sdPathCoeffBuffer = lmsOutputSignal(ids:-1:ids - bufferSize + 1);
+        tempAdaptationStep(ids) = adaptationStep;
+        identError(ids) = pzFilteredSig(ids) - fxlmsOutput' * identErrorBuffer;
+        fxlmsOutput = ...
+            fxlmsOutput + tempAdaptationStep(ids) * sdPathCoeffBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
@@ -93,9 +68,9 @@ function [results] = feedforwardFxLMS(fs, signalLength, learningRate, ...
 
     % Report the result
     if true(mode)
-        results.getFeedbackOutputResults(algorithmAndSystemName, fs, ...
-            signalLength, xk, ypk, identError)
-        results.compareOutputSignalsForEachAlgorithms( ...
-            algorithmAndSystemName, fs, signalLength, ypk, identError);
+        getPlots.getFeedbackOutputResults(...
+            testCaseName, fs, length, signal, pzFilteredSig, identError)
     end
+    getPlots.compareOutputSignalsForEachAlgorithms( ...
+        testCaseName, fs, length, pzFilteredSig, identError);
 end

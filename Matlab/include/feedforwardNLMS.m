@@ -26,38 +26,23 @@
 %
 % ************************************************************************/
 
-function [results] = feedforwardNLMS(fs, signalLength, learningRate, ...
-    dummyPzPath, bufferSize, xk, algorithmAndSystemName, mode)
+function [results] = feedforwardNLMS(signal, length, pzFilteredSig, ...
+    adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
 
-    disp(strcat("[INFO] Start " + algorithmAndSystemName));
-    results = getPlotResults();
-
-    % Calculate the signal filtered by the P(z) filter, which receives 
-    % the excitation signal at the input and the response signal at 
-    % the output
-    ypk = filter(dummyPzPath, 1, xk);
-
-    % Make sure that signals are column vectors
-    ypk = ypk(:);
+    disp(strcat("[INFO] Start " + testCaseName));
 
     % Calculate and generate LMS algorithm output signal (ys(k))
     nlmsOutput = zeros(bufferSize, 1);
-    tempLearningRate = zeros(1, bufferSize);
-    identError = zeros(1, signalLength);
+    tempAdaptationStep = zeros(1, bufferSize);
+    identError = zeros(1, length);
 
-    try
-        for ids = bufferSize:signalLength
-            identErrorBuffer = xk(ids:-1:ids - bufferSize + 1);
-            tempLearningRate(ids) = learningRate / (identErrorBuffer' ...
-                * identErrorBuffer);
-            identError(ids) = ypk(ids) - sum(nlmsOutput' ...
-                * identErrorBuffer);
-            nlmsOutput = nlmsOutput + tempLearningRate(ids) ...
-                * identErrorBuffer * identError(ids);
-        end
-    catch
-        error(strcat("Error in ", algorithmAndSystemName, ": " + ...
-            "The value of the identification error cannot be estimated. "));
+    for ids = bufferSize:length
+        identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
+        tempAdaptationStep(ids) = ...
+            adaptationStep / (identErrorBuffer' * identErrorBuffer);
+        identError(ids) = pzFilteredSig(ids) - sum(nlmsOutput' * identErrorBuffer);
+        nlmsOutput = ...
+            nlmsOutput + tempAdaptationStep(ids) * identErrorBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
@@ -65,9 +50,9 @@ function [results] = feedforwardNLMS(fs, signalLength, learningRate, ...
 
     % Report the results
     if true(mode)
-        results.getFeedbackOutputResults(algorithmAndSystemName, fs, ...
-            signalLength, xk, ypk, identError)
-        results.compareOutputSignalsForEachAlgorithms( ...
-            algorithmAndSystemName, fs, signalLength, ypk, identError);
+        getPlots.getFeedbackOutputResults(...
+            testCaseName, fs, length, signal, pzFilteredSig, identError)
     end
+    getPlots.compareOutputSignalsForEachAlgorithms( ...
+        testCaseName, fs, length, pzFilteredSig, identError);
 end

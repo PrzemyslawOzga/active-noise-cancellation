@@ -29,84 +29,75 @@ function activeNoiseCancellation(varargin)
             addpath("./include/")
         end
     
-        %% Initialize parameters and dataset
-        % We don't know P(z) - primary path - in reality. So we have 
-        % to make dummy paths
-        filterWeightsBufferSize = 128; % Filter buffer size
-        dummyPzPath = 0.25 * randn(filterWeightsBufferSize, 1); 
-        learningRate = 0.01; % Adaptation step
+        %% Initialize parameters, signals and dataset
+        inputSig = randn(50000, 1);
+        inputSig = inputSig/max(inputSig);
+        sigLength = length(inputSig);
+
+        bufferSize = 128;
+        adaptationStep = 0.01;
         fs = 1000;
-    
-        % Generate input corrupted signal
-        inputSignal = randn(50000, 1);
-        inputSignal = inputSignal/max(inputSignal);
-        signalLength = length(inputSignal);
-    
+
+        % We don't know P(z) in reality - so we have to make dummy paths
+        pzFilter = 0.25 * randn(bufferSize, 1); 
+
+        % Calculate the signal filtered by the P(z) path
+        pzFilteredSig = filter(pzFilter, 1, inputSig);
+        szFilter = pzFilter * 0.25;
+        % We do not know S(z) in reality - so we have to make dummy paths
+        szFilteredSig = filter(szFilter, 1, inputSig);
+        
         % Make sure that signals are column vectors
-        inputSignal = inputSignal(:);
+        pzFilteredSig = pzFilteredSig(:);
+        szFilteredSig = szFilteredSig(:);
+        inputSig = inputSig(:);
+
+        getPlots = getPlotResults();
     
         %% Run LMS, FxLMS, NLMS and FxNLMS in feedforward and feedback 
         %% systems
         disp("[INFO] Run active noise cancellation in LMS, FxLMS, " + ...
             "NLMS and FxNLMS algorithm.");
         
-        tic
-            algorithmAndSystemName = "Feedforward LMS";
-            feedforwardLMS( ...
-                fs, signalLength, learningRate, dummyPzPath, ...
-                filterWeightsBufferSize, inputSignal, ...
-                algorithmAndSystemName, mode);
-        toc
+        testCaseName = "Feedforward LMS";
+        feedforwardLMS( ...
+            inputSig, sigLength, pzFilteredSig, adaptationStep, ...
+            bufferSize, fs, testCaseName, mode, getPlots);
     
-        tic
-        algorithmAndSystemName = "Feedforward FxLMS";
+        testCaseName = "Feedforward FxLMS";
         feedforwardFxLMS( ...
-            fs, signalLength, learningRate, dummyPzPath, ...
-            filterWeightsBufferSize, inputSignal, ...
-            algorithmAndSystemName, mode);
-        toc
+            inputSig, sigLength, pzFilteredSig, szFilteredSig, ...
+            adaptationStep, bufferSize, fs, testCaseName, mode, getPlots);
 
-        tic
-        algorithmAndSystemName = "Feedforward NLMS";
+        testCaseName = "Feedforward NLMS";
         feedforwardNLMS( ...
-            fs, signalLength, learningRate, dummyPzPath, ...
-            filterWeightsBufferSize, inputSignal, ...
-            algorithmAndSystemName, mode);
-        toc
+            inputSig, sigLength, pzFilteredSig, adaptationStep, ...
+            bufferSize, fs, testCaseName, mode, getPlots);
     
-        tic;
-        algorithmAndSystemName = "Feedforward FxNLMS";
+        testCaseName = "Feedforward FxNLMS";
         feedforwardFxNLMS( ...
-            fs, signalLength, learningRate, dummyPzPath, ...
-            filterWeightsBufferSize, inputSignal, ...
-            algorithmAndSystemName, mode);
-        toc
+            inputSig, sigLength, pzFilteredSig, szFilteredSig, ...
+            adaptationStep, bufferSize, fs, testCaseName, mode, getPlots);
     
-        %tic
-            %algorithmAndSystemName = "Feedback LMS";
-            %feedbackLMS();
-        %toc
+        %testCaseName = "Feedback LMS";
+        %feedbackLMS( ...
+        %    inputSig, sigLength, pzFilteredSig, adaptationStep, ...
+        %    bufferSize, fs, testCaseName, mode, getPlots);
     
-        %tic
-            %algorithmAndSystemName = "Feedback FxLMS";
-            %feedbackFxLMS();
-        %toc
+        %testCaseName = "Feedback FxLMS";
+        %feedbackFxLMS();
 
-        %tic
-            %algorithmAndSystemName = "Feedback NLMS";
-            %feedbackNLMS();
-        %toc
+        %testCaseName = "Feedback NLMS";
+        %feedbackNLMS( ...
+        %    inputSig, sigLength, pzFilteredSig, adaptationStep, ...
+        %    bufferSize, fs, testCaseName, mode, getPlots);
 
-        %tic
-            %algorithmAndSystemName = "Feedback FxNLMS";
-            %feedbackFxNLMS();
-        %toc
+        %testCaseName = "Feedback FxNLMS";
+        %feedbackFxNLMS();
     
         disp("[INFO] Simulation of noise cancellation done.");
     
         %% Results summary
-        feedforwardystemName = "feedforward";
-        feedbackSystemName = "feedback";
         disp("[INFO] Generate comparison of output error signal " + ...
             "between all algorithms.");
     
