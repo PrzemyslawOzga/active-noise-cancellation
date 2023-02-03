@@ -23,9 +23,33 @@
 %
 % ************************************************************************/
 
-function [results] = feedbackNLMS(fs, signalLength, learningRate, ...
-    dummyPzPath, bufferSize, xk, algorithmAndSystemName, mode)
+function [results] = feedbackNLMS(signal, length, pzFilteredSig, ...
+    adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
+    
+    disp(strcat("[INFO] Start " + testCaseName));
 
-    % to do
+    % Calculate and generate LMS algorithm output signal (ys(k))
+    nlmsOutput = zeros(bufferSize, 1);
+    tempAdaptationStep = zeros(1, bufferSize);
+    identError = zeros(1, length);
 
+    for ids = bufferSize:length
+        identErrorBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
+        tempAdaptationStep(ids) = adaptationStep / (identErrorBuffer' ...
+            * identErrorBuffer);
+        identError(ids) = pzFilteredSig(ids) - sum(nlmsOutput' * identErrorBuffer);
+        nlmsOutput = nlmsOutput + tempAdaptationStep(ids) ...
+            * identErrorBuffer * identError(ids);
+    end
+
+    % Make sure that output error signal are column vectors
+    identError = identError(:);
+
+    % Report the results
+    if true(mode)
+        getPlots.getFeedbackOutputResults(testCaseName, fs, ...
+            length, signal, pzFilteredSig, identError)
+    end
+    getPlots.compareOutputSignalsForEachAlgorithms( ...
+        testCaseName, fs, length, pzFilteredSig, identError);
 end

@@ -79,18 +79,18 @@ function activeNoiseCancellation(varargin)
             inputSig, sigLength, pzFilteredSig, szFilteredSig, ...
             adaptationStep, bufferSize, fs, testCaseName, mode, getPlots);
     
-        %testCaseName = "Feedback LMS";
-        %feedbackLMS( ...
-        %    inputSig, sigLength, pzFilteredSig, adaptationStep, ...
-        %    bufferSize, fs, testCaseName, mode, getPlots);
+        testCaseName = "Feedback LMS";
+        feedbackLMS( ...
+            inputSig, sigLength, pzFilteredSig, adaptationStep, ...
+            bufferSize, fs, testCaseName, mode, getPlots);
     
         %testCaseName = "Feedback FxLMS";
         %feedbackFxLMS();
 
-        %testCaseName = "Feedback NLMS";
-        %feedbackNLMS( ...
-        %    inputSig, sigLength, pzFilteredSig, adaptationStep, ...
-        %    bufferSize, fs, testCaseName, mode, getPlots);
+        testCaseName = "Feedback NLMS";
+        feedbackNLMS( ...
+            inputSig, sigLength, pzFilteredSig, adaptationStep, ...
+            bufferSize, fs, testCaseName, mode, getPlots);
 
         %testCaseName = "Feedback FxNLMS";
         %feedbackFxNLMS();
@@ -112,6 +112,6 @@ function printHelp()
     disp("  Usage:");
     disp("    activeNoiseCancellation([mode: [true, false]])");
     disp("  Usage example:");
-    disp("    activeNoiseCancellation('false') -> without debug mode");
-    disp("    activeNoiseCancellation('true') -> with debug mode");
+    disp("    activeNoiseCancellation('false') -> without debug extra plots");
+    disp("    activeNoiseCancellation('true') -> with debug extra plots");
 end
