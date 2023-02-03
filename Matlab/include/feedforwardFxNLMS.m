@@ -66,12 +66,11 @@ function [results] = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
 
     % Make sure that output error signal are column vectors
     identError = identError(:);
+    results = identError;
 
     % Report the result
     if true(mode)
-        getPlots.getFeedbackOutputResults(...
-            testCaseName, fs, length, signal, pzFilteredSig, identError)
+        getPlots.compareOutputSignalsForEachAlgorithms( ...
+            testCaseName, fs, length, pzFilteredSig, identError);
     end
-    getPlots.compareOutputSignalsForEachAlgorithms( ...
-        testCaseName, fs, length, pzFilteredSig, identError);
 end

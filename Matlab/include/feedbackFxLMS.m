@@ -29,9 +29,14 @@
 %
 % ************************************************************************/
 
-function [results] = feedbackFxLMS(fs, signalLength, learningRate, ...
-    dummyPzPath, bufferSize, xk, algorithmAndSystemName, mode)
+function [results] = feedbackFxLMS(signal, length, pzFilteredSig, ...
+    szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
 
-    % to do
+    
 
+    % Report the result
+    if true(mode)
+        getPlots.compareOutputSignalsForEachAlgorithms( ...
+            testCaseName, fs, length, pzFilteredSig, identError);
+    end
 end
