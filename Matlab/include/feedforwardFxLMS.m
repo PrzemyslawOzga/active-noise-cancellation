@@ -29,12 +29,13 @@
 %
 % ************************************************************************/
 
-function [results] = feedforwardFxLMS(signal, length, pzFilteredSig, ...
+function results = feedforwardFxLMS(signal, length, pzFilteredSig, ...
     szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
 
     disp(strcat("[INFO] Start " + testCaseName));
 
-    % Calculate secondary path signal Sh(z). 
+    tic
+    % Calculate secondary path signal Sh(z) 
     shzEstimate = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, length);
@@ -49,27 +50,30 @@ function [results] = feedforwardFxLMS(signal, length, pzFilteredSig, ...
     shzEstimate = abs(ifft(1./abs(fft(shzEstimate))));
     
     % Calculate and generate output signal with FxLMS algorithm
-    lmsOutputSignal = filter(shzEstimate, 1, signal);
-    fxlmsOutput = zeros(bufferSize, 1);
+    lmsFilter = filter(shzEstimate, 1, signal);
+    lmsOutput = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, length);
 
     for ids = bufferSize:length
         identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
-        sdPathCoeffBuffer = lmsOutputSignal(ids:-1:ids - bufferSize + 1);
+        sdPathCoeffBuffer = lmsFilter(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = adaptationStep;
-        identError(ids) = pzFilteredSig(ids) - fxlmsOutput' * identErrorBuffer;
-        fxlmsOutput = ...
-            fxlmsOutput + tempAdaptationStep(ids) * sdPathCoeffBuffer * identError(ids);
+        identError(ids) = pzFilteredSig(ids) - lmsOutput' * identErrorBuffer;
+        lmsOutput = ...
+            lmsOutput + tempAdaptationStep(ids) * sdPathCoeffBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
     identError = identError(:);
     results = identError;
+    toc
+
+    disp(strcat("[INFO] Stop " + testCaseName));
 
     % Report the result
     if true(mode)
         getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, fs, length, pzFilteredSig, identError);
+            testCaseName, fs, length, signal, identError);
     end
 end

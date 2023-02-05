@@ -11,28 +11,34 @@
 % Thanks to this, the FxLMS algorithm assumes the effects of the 
 % secondary path.
 %
-%              +-----------+                       +   
-% x(k) ------->|    P(z)   |----------yp(k)--------> sum -+--> e(k)
-%              +-----------+                          ^-  |
-%                                                     |   |
+%                                                  +   
+%                                  x(k)------------> sum -+--> e(k)
+%                                                     ^-  |
 %           +-------+        +-------+                |   |
 %       +-->|  C(z) |-+yw(k)-|  S(z) |----------------+   |
 %       |   +-------+ |      +-------+                    |
 %       |   Filter    |          Secondary path           |  
 %       |            +v                                   |
-%       + ------------+ <---------------------------------+
+%       + <-----------+ <---------------------------------+
 %       |               -                                 |
 %       |   +-------+        +-------+                    |
-%       +---| Sh(z)  |<------|  LMS  |-------ye(k)--------+
+%       +-->| Sh(z)  |------>|  LMS  |<------ye(k)--------+
 %           +-------+        +-------+              Error signal     
 %        Estimate of S(z)
 %
 % ************************************************************************/
 
-function [results] = feedbackFxLMS(signal, length, pzFilteredSig, ...
-    szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
+function results = feedbackFxLMS(signal, length, szFilteredSig, ...
+    adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
 
-    
+    disp(strcat("[INFO] Start " + testCaseName));
+
+    tic
+
+
+    toc
+
+    disp(strcat("[INFO] Stop " + testCaseName));
 
     % Report the result
     if true(mode)

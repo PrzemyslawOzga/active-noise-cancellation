@@ -29,12 +29,13 @@
 %
 % ************************************************************************/
 
-function [results] = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
+function results = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
     szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
 
     disp(strcat("[INFO] Start " + testCaseName));
 
-    % Calculate secondary path signal Sh(z). 
+    tic
+    % Calculate secondary path signal Sh(z)
     shzEstimate = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, length);
@@ -49,28 +50,31 @@ function [results] = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
     shzEstimate = abs(ifft(1./abs(fft(shzEstimate))));
     
     % Calculate and generate output signal with FxNLMS algorithm
-    lmsFilteredSig = filter(shzEstimate, 1, signal);
-    fxlmsOutput = zeros(bufferSize, 1);
+    lmsFilter = filter(shzEstimate, 1, signal);
+    lmsOutput = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, length);
 
     for ids = bufferSize:length
         identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
-        samplesForEstimate = lmsFilteredSig(ids:-1:ids - bufferSize + 1);
+        samplesForEstimate = lmsFilter(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = ...
             adaptationStep / (identErrorBuffer' * identErrorBuffer);
-        identError(ids) = pzFilteredSig(ids) - fxlmsOutput' * identErrorBuffer;
-        fxlmsOutput = ...
-            fxlmsOutput + tempAdaptationStep(ids) * samplesForEstimate * identError(ids);
+        identError(ids) = pzFilteredSig(ids) - lmsOutput' * identErrorBuffer;
+        lmsOutput = ...
+            lmsOutput + tempAdaptationStep(ids) * samplesForEstimate * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
     identError = identError(:);
     results = identError;
+    toc
+
+    disp(strcat("[INFO] Stop " + testCaseName));
 
     % Report the result
     if true(mode)
         getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, fs, length, pzFilteredSig, identError);
+            testCaseName, fs, length, signal, identError);
     end
 end

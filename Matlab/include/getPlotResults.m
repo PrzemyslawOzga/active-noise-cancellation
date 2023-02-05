@@ -22,7 +22,7 @@ classdef getPlotResults
             grid minor;
             ylabel('Amplitude');
             xlabel('Time (s)');
-            ylim([-2.5 2.5]);
+            ylim([-1 1]);
             legend('Measurement error signal', 'Output residue signal')
         end
         
