@@ -33,6 +33,7 @@ function activeNoiseCancellation(varargin)
         inputSig = randn(50000, 1);
         inputSig = inputSig/max(inputSig);
         sigLength = length(inputSig);
+        plot(inputSig);
 
         bufferSize = 128;
         adaptationStep = 0.01;
@@ -86,8 +87,8 @@ function activeNoiseCancellation(varargin)
     
         %testCaseName = "Feedback FxLMS";
         %feedbackFxLmsResults = feedbackFxLMS( ...
-        %    inputSig, sigLength, adaptationStep, bufferSize, fs, ...
-        %    testCaseName, mode, getPlots);
+        %    inputSig, sigLength, pzFilteredSig, szFilteredSig, ...
+        %    adaptationStep, bufferSize, fs, testCaseName, mode, getPlots);
 
         testCaseName = "Feedback NLMS";
         feedbackNlmsResults = feedbackNLMS( ...
@@ -95,7 +96,9 @@ function activeNoiseCancellation(varargin)
             testCaseName, mode, getPlots);
 
         %testCaseName = "Feedback FxNLMS";
-        %feedbackFxNLMS();
+        %feedbackFxNLMS( ...
+        %    inputSig, sigLength, pzFilteredSig, szFilteredSig, ...
+        %    adaptationStep, bufferSize, fs, testCaseName, mode, getPlots);
     
         disp("[INFO] Simulation of noise cancellation done.");
     

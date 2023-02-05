@@ -11,9 +11,10 @@
 % Thanks to this, the FxNLMS algorithm assumes the effects of the 
 % secondary path.
 %
-%                                                  +   
-%                                  x(k)------------> sum -+--> e(k)
-%                                                     ^-  |
+%                 +-----------+                    +   
+%    x(k) ------->|   P(z)    |--yp(k)------------> sum --+---> e(k)
+%                 +-----------+                       ^-  |
+%                                                     |   |
 %           +-------+        +-------+                |   |
 %       +-->|  C(z) |-+yw(k)-|  S(z) |----------------+   |
 %       |   +-------+ |      +-------+                    |
@@ -28,14 +29,14 @@
 %
 % ************************************************************************/
 
-function results = feedbackFxNLMS(signal, length, adaptationStep, ...
-    bufferSize, fs, testCaseName, mode, getPlots)
+function results = feedbackFxNLMS(signal, length, pzFilteredSig, ...
+    szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
 
     disp(strcat("[INFO] Start " + testCaseName));
 
     tic
 
-
+    
     toc
 
     disp(strcat("[INFO] Stop " + testCaseName));
