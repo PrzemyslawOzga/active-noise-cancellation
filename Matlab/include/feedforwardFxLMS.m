@@ -36,21 +36,21 @@ function results = feedforwardFxLMS(signal, length, pzFilteredSig, ...
 
     tic
     % Calculate secondary path signal Sh(z) 
-    shzEstimate = zeros(bufferSize, 1);
+    szEstimate = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, length);
 
     for ids = bufferSize:length
         estimateBuffer = signal(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = adaptationStep;
-        identError(ids) = szFilteredSig(ids) - shzEstimate' * estimateBuffer;
-        shzEstimate = ...
-            shzEstimate + tempAdaptationStep(ids) * estimateBuffer * identError(ids);
+        identError(ids) = szFilteredSig(ids) - szEstimate' * estimateBuffer;
+        szEstimate = ...
+            szEstimate + tempAdaptationStep(ids) * estimateBuffer * identError(ids);
     end
-    shzEstimate = abs(ifft(1./abs(fft(shzEstimate))));
+    szEstimate = abs(ifft(1./abs(fft(szEstimate))));
     
     % Calculate and generate output signal with FxLMS algorithm
-    lmsFilter = filter(shzEstimate, 1, signal);
+    lmsFilter = filter(szEstimate, 1, signal);
     lmsOutput = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, length);

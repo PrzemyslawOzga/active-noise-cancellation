@@ -30,7 +30,7 @@ function activeNoiseCancellation(varargin)
         end
     
         %% Initialize parameters, signals and dataset
-        inputSig = randn(100000, 1);
+        inputSig = randn(50000, 1);
         inputSig = inputSig/max(inputSig);
         sigLength = length(inputSig);
 
@@ -48,9 +48,9 @@ function activeNoiseCancellation(varargin)
         szFilteredSig = filter(szFilter, 1, inputSig);
         
         % Make sure that signals are column vectors
+        inputSig = inputSig(:);
         pzFilteredSig = pzFilteredSig(:);
         szFilteredSig = szFilteredSig(:);
-        inputSig = inputSig(:);
 
         getPlots = getPlotResults();
     
@@ -85,7 +85,9 @@ function activeNoiseCancellation(varargin)
             testCaseName, mode, getPlots);
     
         %testCaseName = "Feedback FxLMS";
-        %feedbackFxLMS();
+        %feedbackFxLmsResults = feedbackFxLMS( ...
+        %    inputSig, sigLength, adaptationStep, bufferSize, fs, ...
+        %    testCaseName, mode, getPlots);
 
         testCaseName = "Feedback NLMS";
         feedbackNlmsResults = feedbackNLMS( ...

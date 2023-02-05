@@ -11,9 +11,9 @@
 % in any way. It occurs in the solution of the system, but does not 
 % assume a secondary path.
 %
-%                                                  +   
-%                                  x(k)------------> sum -+--> e(k)
-%                                                     ^-  |
+%                 +-----------+                    +   
+%    x(k) ------->|   P(z)    |--yp(k)------------> sum --+---> e(k)
+%                 +-----------+                       ^-  |
 %                                                     |   |
 %               +------------------ys(k)--------------+   |
 %               |                                         |
