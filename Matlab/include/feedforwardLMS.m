@@ -27,9 +27,7 @@
 % ************************************************************************/
 
 function results = feedforwardLMS(signal, length, pzFilteredSig, ...
-    adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
-
-    disp(strcat("[INFO] Start " + testCaseName));
+    adaptationStep, bufferSize, testCaseName, mode, getPlots)
 
     tic
     % Calculate and generate LMS algorithm output signal (ys(k))
@@ -48,13 +46,12 @@ function results = feedforwardLMS(signal, length, pzFilteredSig, ...
     % Make sure that output error signal are column vectors
     identError = identError(:);
     results = identError;
-    toc;
-
-    disp(strcat("[INFO] Stop " + testCaseName));
+    elapsedTime = toc;
+    disp(strcat("[INFO] Measurement " + testCaseName + " time: " + elapsedTime));
 
     % Report the results
     if true(mode)
         getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, fs, length, signal, identError);
+            testCaseName, signal, identError);
     end
 end

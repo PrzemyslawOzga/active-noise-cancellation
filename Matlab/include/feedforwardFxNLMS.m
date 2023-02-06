@@ -30,9 +30,7 @@
 % ************************************************************************/
 
 function results = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
-    szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
-
-    disp(strcat("[INFO] Start " + testCaseName));
+    szFilteredSig, adaptationStep, bufferSize, testCaseName, mode, getPlots)
 
     tic
     % Calculate secondary path signal Sh(z)
@@ -41,11 +39,11 @@ function results = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
     identError = zeros(1, length);
 
     for ids = bufferSize:length
-        samplesForEstimate = signal(ids:-1:ids - bufferSize + 1);
-        tempAdaptationStep(ids) = 1 / (samplesForEstimate' * samplesForEstimate);
-        identError(ids) = szFilteredSig(ids) - szEstimate' * samplesForEstimate;
+        szEstimateBuffer = signal(ids:-1:ids - bufferSize + 1);
+        tempAdaptationStep(ids) = 1 / (szEstimateBuffer' * szEstimateBuffer);
+        identError(ids) = szFilteredSig(ids) - szEstimate' * szEstimateBuffer;
         szEstimate = ...
-            szEstimate + tempAdaptationStep(ids) * samplesForEstimate * identError(ids);
+            szEstimate + tempAdaptationStep(ids) * szEstimateBuffer * identError(ids);
     end
     szEstimate = abs(ifft(1./abs(fft(szEstimate))));
     
@@ -57,24 +55,23 @@ function results = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
 
     for ids = bufferSize:length
         identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
-        samplesForEstimate = lmsFilter(ids:-1:ids - bufferSize + 1);
+        lmsFilterBuffer = lmsFilter(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = ...
             adaptationStep / (identErrorBuffer' * identErrorBuffer);
         identError(ids) = pzFilteredSig(ids) - lmsOutput' * identErrorBuffer;
         lmsOutput = ...
-            lmsOutput + tempAdaptationStep(ids) * samplesForEstimate * identError(ids);
+            lmsOutput + tempAdaptationStep(ids) * lmsFilterBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
     identError = identError(:);
     results = identError;
-    toc
-
-    disp(strcat("[INFO] Stop " + testCaseName));
+    elapsedTime = toc;
+    disp(strcat("[INFO] Measurement " + testCaseName + " time: " + elapsedTime));
 
     % Report the result
     if true(mode)
         getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, fs, length, signal, identError);
+            testCaseName, signal, identError);
     end
 end

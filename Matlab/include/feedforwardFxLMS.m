@@ -30,9 +30,7 @@
 % ************************************************************************/
 
 function results = feedforwardFxLMS(signal, length, pzFilteredSig, ...
-    szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
-
-    disp(strcat("[INFO] Start " + testCaseName));
+    szFilteredSig, adaptationStep, bufferSize, testCaseName, mode, getPlots)
 
     tic
     % Calculate secondary path signal Sh(z) 
@@ -41,11 +39,11 @@ function results = feedforwardFxLMS(signal, length, pzFilteredSig, ...
     identError = zeros(1, length);
 
     for ids = bufferSize:length
-        estimateBuffer = signal(ids:-1:ids - bufferSize + 1);
+        szEstimateBuffer = signal(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = adaptationStep;
-        identError(ids) = szFilteredSig(ids) - szEstimate' * estimateBuffer;
+        identError(ids) = szFilteredSig(ids) - szEstimate' * szEstimateBuffer;
         szEstimate = ...
-            szEstimate + tempAdaptationStep(ids) * estimateBuffer * identError(ids);
+            szEstimate + tempAdaptationStep(ids) * szEstimateBuffer * identError(ids);
     end
     szEstimate = abs(ifft(1./abs(fft(szEstimate))));
     
@@ -67,13 +65,12 @@ function results = feedforwardFxLMS(signal, length, pzFilteredSig, ...
     % Make sure that output error signal are column vectors
     identError = identError(:);
     results = identError;
-    toc
-
-    disp(strcat("[INFO] Stop " + testCaseName));
+    elapsedTime = toc;
+    disp(strcat("[INFO] Measurement " + testCaseName + " time: " + elapsedTime));
 
     % Report the result
     if true(mode)
         getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, fs, length, signal, identError);
+            testCaseName, signal, identError);
     end
 end

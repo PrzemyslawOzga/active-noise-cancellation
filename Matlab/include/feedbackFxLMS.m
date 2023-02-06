@@ -30,20 +30,47 @@
 % ************************************************************************/
 
 function results = feedbackFxLMS(signal, length, pzFilteredSig, ...
-    szFilteredSig, adaptationStep, bufferSize, fs, testCaseName, mode, getPlots)
-
-    disp(strcat("[INFO] Start " + testCaseName));
+    szFilteredSig, adaptationStep, bufferSize, testCaseName, mode, getPlots)
 
     tic
+    % Calculate secondary path signal Sh(z) 
+    szEstimate = zeros(bufferSize, 1);
+    tempAdaptationStep = zeros(1, bufferSize);
+    identError = zeros(1, length);
 
+    for ids = bufferSize:length
+        estimateBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
+        tempAdaptationStep(ids) = adaptationStep;
+        identError(ids) = szFilteredSig(ids) - szEstimate' * estimateBuffer;
+        szEstimate = ...
+            szEstimate + tempAdaptationStep(ids) * estimateBuffer * identError(ids);
+    end
+    szEstimate = abs(ifft(1./abs(fft(szEstimate))));
     
-    toc
+    % Calculate and generate output signal with FxLMS algorithm
+    lmsFilter = filter(szEstimate, 1, pzFilteredSig);
+    lmsOutput = zeros(bufferSize, 1);
+    tempAdaptationStep = zeros(1, bufferSize);
+    identError = zeros(1, length);
 
-    disp(strcat("[INFO] Stop " + testCaseName));
+    for ids = bufferSize:length
+        identErrorBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
+        sdPathCoeffBuffer = lmsFilter(ids:-1:ids - bufferSize + 1);
+        tempAdaptationStep(ids) = adaptationStep;
+        identError(ids) = pzFilteredSig(ids) - lmsOutput' * identErrorBuffer;
+        lmsOutput = ...
+            lmsOutput + tempAdaptationStep(ids) * sdPathCoeffBuffer * identError(ids);
+    end
+
+    % Make sure that output error signal are column vectors
+    identError = identError(:);
+    results = identError;
+    elapsedTime = toc;
+    disp(strcat("[INFO] Measurement " + testCaseName + " time: " + elapsedTime));
 
     % Report the result
     if true(mode)
         getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, fs, length, signal, identError);
+            testCaseName, signal, identError);
     end
 end
