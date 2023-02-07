@@ -18,23 +18,23 @@ classdef getPlotResults
         function getPlotInformation(obj, name, algorithm)
             grid on;
             grid minor;
-            ylabel('Amplitude');
-            xlabel('Time (s)');
+            ylabel('Amplitude', 'FontSize', 14);
+            xlabel('Time (s)', 'FontSize', 14);
             ylim([-2 2]);
             legend('Measurement error signal', 'Output residue signal');
             title(strcat( ...
-                "Results of " + name + " system in " + algorithm + " algorithm"));
+                "Results of " + name + " system in " + algorithm + " algorithm"), 'FontSize', 14);
         end
         function getInputSignalPlot(obj, signal)
             figure;
             plot(obj.time, signal);
             grid on;
             grid minor;
-            ylabel('Amplitude');
-            xlabel('Time (s)');
+            ylabel('Amplitude', 'FontSize', 18);
+            xlabel('Time (s)', 'FontSize', 18);
             ylim([-2 2]);
             legend('Measurement error signal');
-            title("Input signal before active noise cancellation - x(k)");
+            title("Input signal before active noise cancellation - x(k)", 'FontSize', 18);
         end
         function compareOutputSignalsForEachAlgorithms( ...
                 obj, name, signal, err)
