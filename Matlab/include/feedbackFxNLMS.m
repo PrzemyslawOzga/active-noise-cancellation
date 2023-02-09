@@ -48,19 +48,19 @@ function results = feedbackFxNLMS(signal, length, pzFilteredSig, ...
     szEstimate = abs(ifft(1./abs(fft(szEstimate))));
     
     % Calculate and generate output signal with FxLMS algorithm
-    lmsFilter = filter(szEstimate, 1, pzFilteredSig);
-    lmsOutput = zeros(bufferSize, 1);
+    nlmsFilter = filter(szEstimate, 1, pzFilteredSig);
+    nlmsOutput = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, length);
 
     for ids = bufferSize:length
         identErrorBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
-        lmsFilterBuffer = lmsFilter(ids:-1:ids - bufferSize + 1);
+        nlmsFilterBuffer = nlmsFilter(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = ...
             adaptationStep / (identErrorBuffer' * identErrorBuffer);
-        identError(ids) = pzFilteredSig(ids) - lmsOutput' * identErrorBuffer;
-        lmsOutput = ...
-            lmsOutput + tempAdaptationStep(ids) * lmsFilterBuffer * identError(ids);
+        identError(ids) = pzFilteredSig(ids) - nlmsOutput' * identErrorBuffer;
+        nlmsOutput = ...
+            nlmsOutput + tempAdaptationStep(ids) * nlmsFilterBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
