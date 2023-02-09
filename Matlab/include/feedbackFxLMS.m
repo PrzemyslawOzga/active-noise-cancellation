@@ -39,11 +39,11 @@ function results = feedbackFxLMS(signal, length, pzFilteredSig, ...
     identError = zeros(1, length);
 
     for ids = bufferSize:length
-        estimateBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
+        szEstimateBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = adaptationStep;
-        identError(ids) = szFilteredSig(ids) - szEstimate' * estimateBuffer;
+        identError(ids) = szFilteredSig(ids) - szEstimate' * szEstimateBuffer;
         szEstimate = ...
-            szEstimate + tempAdaptationStep(ids) * estimateBuffer * identError(ids);
+            szEstimate + tempAdaptationStep(ids) * szEstimateBuffer * identError(ids);
     end
     szEstimate = abs(ifft(1./abs(fft(szEstimate))));
     
