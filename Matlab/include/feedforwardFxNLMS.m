@@ -29,21 +29,30 @@
 %
 % ************************************************************************/
 
-function results = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
-    szFilteredSig, adaptationStep, bufferSize, testCaseName, mode, getPlots)
+function results = feedforwardFxNLMS(signal, pzFilter, bufferSize, testCaseName, testMode)
+
+    signalLength = length(signal);
+    fs = 1000;
+    getPlots = getPlotResults(signalLength, fs);
+    adaptationStep = 0.0075;
+
+    pzFilteredSig = filter(pzFilter, 1, signal);
+    pzFilteredSig = pzFilteredSig(:);
+    szFilter = pzFilter * 0.25;
+    szFilteredSig = filter(szFilter, 1, signal);
+    szFilteredSig = szFilteredSig(:);
 
     tic
     % Calculate secondary path signal Sh(z)
     szEstimate = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
-    identError = zeros(1, length);
+    identError = zeros(1, signalLength);
 
-    for ids = bufferSize:length
+    for ids = bufferSize:signalLength
         szEstimateBuffer = signal(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = 1 / (szEstimateBuffer' * szEstimateBuffer);
         identError(ids) = szFilteredSig(ids) - szEstimate' * szEstimateBuffer;
-        szEstimate = ...
-            szEstimate + tempAdaptationStep(ids) * szEstimateBuffer * identError(ids);
+        szEstimate = szEstimate + tempAdaptationStep(ids) * szEstimateBuffer * identError(ids);
     end
     szEstimate = abs(ifft(1./abs(fft(szEstimate))));
     
@@ -51,16 +60,14 @@ function results = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
     nlmsFilter = filter(szEstimate, 1, signal);
     nlmsOutput = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
-    identError = zeros(1, length);
+    identError = zeros(1, signalLength);
 
-    for ids = bufferSize:length
+    for ids = bufferSize:signalLength
         identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
         nlmsFilterBuffer = nlmsFilter(ids:-1:ids - bufferSize + 1);
-        tempAdaptationStep(ids) = ...
-            adaptationStep / (identErrorBuffer' * identErrorBuffer);
+        tempAdaptationStep(ids) = adaptationStep / (identErrorBuffer' * identErrorBuffer);
         identError(ids) = pzFilteredSig(ids) - nlmsOutput' * identErrorBuffer;
-        nlmsOutput = ...
-            nlmsOutput + tempAdaptationStep(ids) * nlmsFilterBuffer * identError(ids);
+        nlmsOutput = nlmsOutput + tempAdaptationStep(ids) * nlmsFilterBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
@@ -70,8 +77,7 @@ function results = feedforwardFxNLMS(signal, length, pzFilteredSig, ...
     disp(strcat("[INFO] Measurement " + testCaseName + " time: " + elapsedTime));
 
     % Report the result
-    if true(mode)
-        getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, signal, identError);
+    if testMode
+        getPlots.compareOutputSignalsForEachAlgorithms(testCaseName, signal, identError);
     end
 end

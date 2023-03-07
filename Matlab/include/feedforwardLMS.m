@@ -26,21 +26,27 @@
 %
 % ************************************************************************/
 
-function results = feedforwardLMS(signal, length, pzFilteredSig, ...
-    adaptationStep, bufferSize, testCaseName, mode, getPlots)
+function results = feedforwardLMS(signal, pzFilter, bufferSize, testCaseName, testMode)
 
+    signalLength = length(signal);
+    fs = 1000;
+    getPlots = getPlotResults(signalLength, fs);
+    adaptationStep = 0.0075;
+
+    pzFilteredSig = filter(pzFilter, 1, signal);
+    pzFilteredSig = pzFilteredSig(:);
+    
     tic
     % Calculate and generate LMS algorithm output signal (ys(k))
     lmsOutput = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
-    identError = zeros(1, length);
+    identError = zeros(1, signalLength);
 
-    for ids = bufferSize:length
+    for ids = bufferSize:signalLength
         identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = adaptationStep;
         identError(ids) = pzFilteredSig(ids) - sum(lmsOutput .* identErrorBuffer);
-        lmsOutput = ...
-            lmsOutput + tempAdaptationStep(ids) * identErrorBuffer * identError(ids);
+        lmsOutput = lmsOutput + tempAdaptationStep(ids) * identErrorBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
@@ -50,8 +56,7 @@ function results = feedforwardLMS(signal, length, pzFilteredSig, ...
     disp(strcat("[INFO] Measurement " + testCaseName + " time: " + elapsedTime));
 
     % Report the results
-    if true(mode)
-        getPlots.compareOutputSignalsForEachAlgorithms( ...
-            testCaseName, signal, identError);
+    if testMode
+        getPlots.compareOutputSignalsForEachAlgorithms(testCaseName, signal, identError);
     end
 end

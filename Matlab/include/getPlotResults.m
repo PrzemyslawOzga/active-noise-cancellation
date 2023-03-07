@@ -15,7 +15,7 @@ classdef getPlotResults
         function obj = getPlotResults(length, fs)
             obj.time = linspace(0, length/fs, length);
         end
-        function getPlotInformation(obj, name, algorithm)
+        function getPlotInformation(name, algorithm)
             grid on;
             grid minor;
             ylabel('Amplitude', 'FontSize', 14);
@@ -71,6 +71,31 @@ classdef getPlotResults
             hold on;
             plot(obj.time, err4, 'Color', lineColor);
             obj.getPlotInformation(name, algorithm(4));
+        end
+        function getPlotActiceVsPassiveNC(obj)
+            fig = figure;
+            plotAxes = axes('Parent', fig);
+            hold(plotAxes, 'on');
+            formatFreqAxis(plotAxes, 16, 20000)
+            grid on;
+            grid minor;
+            plot([20, 1000], [-30 -30], 'LineWidth', 3, 'Color', [1 0 0]);
+            hold on;
+            plot([1000, 1500], [-30 -30], 'LineWidth', 3, 'LineStyle', ':', 'Color', [1 0 0]);
+            hold on;
+            plot([20, 1000], [-10 -10], 'LineWidth', 3, 'LineStyle', ':', 'Color', [0 0 0]);
+            hold on;
+            plot([1000, 1500], [-10 -25], 'LineWidth', 3, 'LineStyle', ':', 'Color', [0 0 0]);
+            hold on;
+            plot([1500, 20000], [-25 -25], 'LineWidth', 3, 'Color', [0 0 0]);
+            plotAxes.YLim = [-50, 50];
+            xlabel(plotAxes, "Frequencies");
+            ylabel(plotAxes, "Reduction");
+            title("Active vs passive noise reduction")
+            legend('Frequency range reduced by active methods', '', ...
+                '', '', 'Frequency range reduced by passive methods');
+            hold(plotAxes, 'off');
+            hold off;
         end
     end
 end
