@@ -92,13 +92,14 @@ function ActiveNoiseCancellation(varargin)
         sigLength = length(inputSignal);
         getPlots = getPlotResults(sigLength, fs);
 
-        % System names 
-        systemNames = ["feedback", "feedforward"];
-        algorithmNames = ["LMS", "FxLMS", "NLMS", "FxNLMS"];
+        feedforwardResults = [ffLMS, ffFxLMS, ffNLMS, ffFxNLMS];
+        feedforwardSystemNames = ["Feedforward LMS", "Feedforward FxLMS", "Feedforward NLMS", "Feedforward FxNLMS"];
+        feedbackResults = [fbLMS, fbFxLMS, fbNLMS, fbFxNLMS];
+        feedbackSystemNames = ["Feedback LMS", "Feedback FxLMS", "Feedback NLMS", "Feedback FxNLMS"];
 
         getPlots.getInputSignalPlot(inputSignal);
-        getPlots.compareAllOneSystemResults(systemNames(2), algorithmNames, inputSignal, ffLMS, ffFxLMS, ffNLMS, ffFxNLMS);
-        getPlots.compareAllOneSystemResults(systemNames(1), algorithmNames, inputSignal, fbLMS, fbFxLMS, fbNLMS, fbFxNLMS);
+        getPlots.compareAllOneSystemResults(feedforwardSystemNames, inputSignal, feedforwardResults);
+        getPlots.compareAllOneSystemResults(feedbackSystemNames, inputSignal, feedbackResults);
         disp("[INFO] Generate comparison done.");
 
     catch ME
@@ -108,8 +109,8 @@ end
 
 function printHelp()
     disp("  Usage:");
-    disp("    activeNoiseCancellation([testMode: [true, false]])");
+    disp("    activeNoiseCancellation('testMode', [true, false])");
     disp("  Usage example:");
-    disp("    activeNoiseCancellation('false') -> without debug extra plots");
-    disp("    activeNoiseCancellation('true') -> with debug extra plots");
+    disp("    activeNoiseCancellation('testMode', false) -> without debug extra plots");
+    disp("    activeNoiseCancellation('testMode', true)) -> with debug extra plots");
 end
