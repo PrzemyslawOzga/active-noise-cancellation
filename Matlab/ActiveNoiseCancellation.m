@@ -56,7 +56,7 @@ function ActiveNoiseCancellation(varargin)
         % Feedforward LMS
         testCaseName = "Feedforward LMS";
         ffLMS = feedforwardLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
-    
+
         % Feedforward FxLMS
         testCaseName = "Feedforward FxLMS";
         ffFxLMS = feedforwardFxLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
@@ -86,7 +86,7 @@ function ActiveNoiseCancellation(varargin)
         fbFxNLMS = feedbackFxNLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
 
         disp("[INFO] Simulation of noise cancellation done.");
-    
+  
         %% Results summary
         disp("[INFO] Generate comparison of output error signal between all systems and algorithms.");
         sigLength = length(inputSignal);

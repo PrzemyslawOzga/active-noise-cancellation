@@ -39,14 +39,12 @@ function results = feedforwardLMS(signal, pzFilter, bufferSize, testCaseName, te
     tic
     % Calculate and generate LMS algorithm output signal (ys(k))
     lmsOutput = zeros(bufferSize, 1);
-    tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
 
     for ids = bufferSize:signalLength
         identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
-        tempAdaptationStep(ids) = adaptationStep;
         identError(ids) = pzFilteredSig(ids) - sum(lmsOutput .* identErrorBuffer);
-        lmsOutput = lmsOutput + tempAdaptationStep(ids) * identErrorBuffer * identError(ids);
+        lmsOutput = lmsOutput + adaptationStep * identErrorBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
