@@ -44,21 +44,21 @@ function results = feedbackFxNLMS(signal, pzFilter, bufferSize, testCaseName, te
 
     tic
     % Calculate secondary path signal Sh(z) 
-    szEstimate = zeros(bufferSize, 1);
+    szCoeffs = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
 
     for ids = bufferSize:signalLength
         szEstimateBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = 1 / (szEstimateBuffer' * szEstimateBuffer);
-        identError(ids) = szFilteredSig(ids) - szEstimate' * szEstimateBuffer;
-        szEstimate = szEstimate + tempAdaptationStep(ids) * szEstimateBuffer * identError(ids);
+        identError(ids) = szFilteredSig(ids) - szCoeffs' * szEstimateBuffer;
+        szCoeffs = szCoeffs + tempAdaptationStep(ids) * szEstimateBuffer * identError(ids);
     end
-    szEstimate = abs(ifft(1./abs(fft(szEstimate))));
+    szCoeffs = abs(ifft(1./abs(fft(szCoeffs))));
     
     % Calculate and generate output signal with FxLMS algorithm
-    nlmsFilter = filter(szEstimate, 1, pzFilteredSig);
-    nlmsOutput = zeros(bufferSize, 1);
+    nlmsFilter = filter(szCoeffs, 1, pzFilteredSig);
+    nlmsCoeffs = zeros(bufferSize, 1);
     tempAdaptationStep = zeros(1, bufferSize);
     identError = zeros(1, signalLength);
 
@@ -66,8 +66,8 @@ function results = feedbackFxNLMS(signal, pzFilter, bufferSize, testCaseName, te
         identErrorBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
         nlmsFilterBuffer = nlmsFilter(ids:-1:ids - bufferSize + 1);
         tempAdaptationStep(ids) = adaptationStep / (identErrorBuffer' * identErrorBuffer);
-        identError(ids) = pzFilteredSig(ids) - nlmsOutput' * identErrorBuffer;
-        nlmsOutput = nlmsOutput + tempAdaptationStep(ids) * nlmsFilterBuffer * identError(ids);
+        identError(ids) = pzFilteredSig(ids) - nlmsCoeffs' * identErrorBuffer;
+        nlmsCoeffs = nlmsCoeffs + tempAdaptationStep(ids) * nlmsFilterBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors

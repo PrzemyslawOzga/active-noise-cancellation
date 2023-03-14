@@ -44,28 +44,26 @@ function results = feedbackFxLMS(signal, pzFilter, bufferSize, testCaseName, tes
 
     tic
     % Calculate secondary path signal Sh(z) 
-    szEstimate = zeros(bufferSize, 1);
+    szCoeffs = zeros(bufferSize, 1);
     identError = zeros(1, signalLength);
 
     for ids = bufferSize:signalLength
         szEstimateBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
-        identError(ids) = szFilteredSig(ids) - szEstimate' * szEstimateBuffer;
-        szEstimate = szEstimate + adaptationStep * szEstimateBuffer * identError(ids);
+        identError(ids) = szFilteredSig(ids) - szCoeffs' * szEstimateBuffer;
+        szCoeffs = szCoeffs + adaptationStep * szEstimateBuffer * identError(ids);
     end
-    szEstimate = abs(ifft(1./abs(fft(szEstimate))));
+    szCoeffs = abs(ifft(1./abs(fft(szCoeffs))));
     
     % Calculate and generate output signal with FxLMS algorithm
-    lmsFilter = filter(szEstimate, 1, pzFilteredSig);
-    lmsOutput = zeros(bufferSize, 1);
-    tempAdaptationStep = zeros(1, bufferSize);
+    lmsFilter = filter(szCoeffs, 1, pzFilteredSig);
+    lmsCoeffs = zeros(bufferSize, 1);
     identError = zeros(1, signalLength);
 
     for ids = bufferSize:signalLength
         identErrorBuffer = pzFilteredSig(ids:-1:ids - bufferSize + 1);
         sdPathCoeffBuffer = lmsFilter(ids:-1:ids - bufferSize + 1);
-        tempAdaptationStep(ids) = adaptationStep;
-        identError(ids) = pzFilteredSig(ids) - lmsOutput' * identErrorBuffer;
-        lmsOutput = lmsOutput + adaptationStep * sdPathCoeffBuffer * identError(ids);
+        identError(ids) = pzFilteredSig(ids) - lmsCoeffs' * identErrorBuffer;
+        lmsCoeffs = lmsCoeffs + adaptationStep * sdPathCoeffBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors

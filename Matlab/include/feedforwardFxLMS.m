@@ -44,26 +44,34 @@ function results = feedforwardFxLMS(signal, pzFilter, bufferSize, testCaseName, 
 
     tic
     % Calculate secondary path signal Sh(z) 
-    szEstimate = zeros(bufferSize, 1);
+    szCoeffs = zeros(bufferSize, 1);
     identError = zeros(1, signalLength);
 
     for ids = bufferSize:signalLength
         szEstimateBuffer = signal(ids:-1:ids - bufferSize + 1);
-        identError(ids) = szFilteredSig(ids) - szEstimate' * szEstimateBuffer;
-        szEstimate = szEstimate + adaptationStep * szEstimateBuffer * identError(ids);
+        identError(ids) = szFilteredSig(ids) - szCoeffs' * szEstimateBuffer;
+        szCoeffs = szCoeffs + adaptationStep * szEstimateBuffer * identError(ids);
     end
-    szEstimate = abs(ifft(1./abs(fft(szEstimate))));
+    szCoeffs = abs(ifft(1./abs(fft(szCoeffs))));
     
     % Calculate and generate output signal with FxLMS algorithm
-    lmsFilter = filter(szEstimate, 1, signal);
-    lmsOutput = zeros(bufferSize, 1);
+    lmsFilter = filter(szCoeffs, 1, signal);
+    lmsCoeffs = zeros(bufferSize, 1);
     identError = zeros(1, signalLength);
-    
+%{
+    frameSize = 128;
+    for ids = bufferSize:frameSize:signalLength
+        identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
+        sdPathCoeffBuffer = lmsFilter(ids:-1:ids - bufferSize + 1);
+        identError(ids - frameSize + 1 : ids) = pzFilteredSig(ids) - lmsCoeffs' * identErrorBuffer;
+        lmsCoeffs = lmsCoeffs + adaptationStep * sdPathCoeffBuffer * identError(ids - frameSize + 1 : ids);
+    end
+%}
     for ids = bufferSize:signalLength
         identErrorBuffer = signal(ids:-1:ids - bufferSize + 1);
         sdPathCoeffBuffer = lmsFilter(ids:-1:ids - bufferSize + 1);
-        identError(ids) = pzFilteredSig(ids) - lmsOutput' * identErrorBuffer;
-        lmsOutput = lmsOutput + adaptationStep * sdPathCoeffBuffer * identError(ids);
+        identError(ids) = pzFilteredSig(ids) - lmsCoeffs' * identErrorBuffer;
+        lmsCoeffs = lmsCoeffs + adaptationStep * sdPathCoeffBuffer * identError(ids);
     end
 
     % Make sure that output error signal are column vectors
