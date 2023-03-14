@@ -42,48 +42,50 @@ function ActiveNoiseCancellation(varargin)
         end
     
         %% Initialize parameters, signals and dataset
-        inputSignal = randn(50000, 1);
-        inputSignal = inputSignal/max(inputSignal);
-        inputSignal = inputSignal(:);
-
-        fs = 1000;
+        %fs = 44100; % 44.1k Hz
+        fs = 16000; % 16k Hz
         bufferSize = 128;
         pzFilter = 0.25 * randn(bufferSize, 1); 
+
+        %inputSignal = randn(2205000, 1); % signal for fs = 44.1k Hz [50s]
+        inputSignal = randn(800000, 1); % signal for fs = 16k Hz [50s]
+        inputSignal = inputSignal/max(inputSignal);
+        inputSignal = inputSignal(:);
     
         %% Run LMS, FxLMS, NLMS and FxNLMS in feedforward and feedback systems
         disp("[INFO] Run active noise cancellation in LMS, FxLMS, NLMS and FxNLMS algorithm.");
 
         % Feedforward LMS
         testCaseName = "Feedforward LMS";
-        ffLMS = feedforwardLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        ffLMS = feedforwardLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedforward FxLMS
         testCaseName = "Feedforward FxLMS";
-        ffFxLMS = feedforwardFxLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        ffFxLMS = feedforwardFxLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedforward NLMS
         testCaseName = "Feedforward NLMS";
-        ffNLMS = feedforwardNLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        ffNLMS = feedforwardNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedforward FxNLMS
         testCaseName = "Feedforward FxNLMS";
-        ffFxNLMS = feedforwardFxNLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        ffFxNLMS = feedforwardFxNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedback LMS
         testCaseName = "Feedback LMS";
-        fbLMS = feedbackLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        fbLMS = feedbackLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
     
         % Feedback FxLMS
         testCaseName = "Feedback FxLMS";
-        fbFxLMS = feedbackFxLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        fbFxLMS = feedbackFxLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedback NLMS
         testCaseName = "Feedback NLMS";
-        fbNLMS = feedbackNLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        fbNLMS = feedbackNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedback FxNLMS
         testCaseName = "Feedback FxNLMS";
-        fbFxNLMS = feedbackFxNLMS(inputSignal, pzFilter, bufferSize, testCaseName, testMode);
+        fbFxNLMS = feedbackFxNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         disp("[INFO] Simulation of noise cancellation done.");
   

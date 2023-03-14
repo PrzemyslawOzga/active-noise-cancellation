@@ -29,10 +29,9 @@
 %
 % ************************************************************************/
 
-function results = feedforwardFxLMS(signal, pzFilter, bufferSize, testCaseName, testMode)
+function results = feedforwardFxLMS(signal, fs, pzFilter, bufferSize, testCaseName, testMode)
 
     signalLength = length(signal);
-    fs = 1000;
     getPlots = getPlotResults(signalLength, fs);
     adaptationStep = 0.0075;
 
