@@ -15,32 +15,32 @@ Diagrams of the algorithms described above are shown below.
 
 #### LMS - Least Mean Squares algorithm in feed-forward system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ff_LMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ffLMS.png)
 
 #### Filtered-X Least Mean Squares algorithm in feed-forward system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ff_FxLMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ffFxLMS.png)
 
 #### Normalized Least Mean Squares algorithm in feed-forward system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ff_NLMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ffNLMS.png)
 
 #### Filtered-X Normalized Least Mean Squares algorithm in feed-forward system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ff_FxNLMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/ffFxNLMS.png)
 
 #### LMS - Least Mean Squares algorithm in feedback system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fb_LMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fbLMS.png)
 
 #### Filtered-X Least Mean Squares algorithm in feedback system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fb_FxLMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fbFxLMS.png)
 
 #### Normalized Least Mean Squares algorithm in feedback system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fb_NLMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fbNLMS.png)
 
 #### Filtered-X Normalized Least Mean Squares algorithm in feedback system
 
-![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fb_FxNLMS.png)
+![alt text](https://github.com/PrzemyslawOzga/active-noise-cancellation/blob/main/graphics/fbFxNLMS.png)
