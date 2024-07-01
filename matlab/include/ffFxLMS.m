@@ -29,7 +29,7 @@
 %
 % ************************************************************************/
 
-function results = feedforwardFxLMS(signal, fs, pzFilter, bufferSize, testCaseName, testMode)
+function results = ffFxLMS(signal, fs, pzFilter, bufferSize, testCaseName, testMode)
 
     signalLength = length(signal);
     getPlots = getPlotResults(signalLength, fs);
