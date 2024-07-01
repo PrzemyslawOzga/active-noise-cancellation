@@ -26,7 +26,7 @@
 %
 % ************************************************************************/
 
-function results = feedforwardNLMS(signal, fs, pzFilter, bufferSize, testCaseName, testMode)
+function results = ffNLMS(signal, fs, pzFilter, bufferSize, testCaseName, testMode)
 
     signalLength = length(signal);
     getPlots = getPlotResults(signalLength, fs);
