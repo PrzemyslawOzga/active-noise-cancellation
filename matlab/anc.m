@@ -4,7 +4,7 @@
 % Project name: ANC using feedback and feedforward system
 % ************************************************************************/
 
-function ActiveNoiseCancellation(varargin)
+function anc(varargin)
 
     try
         %% User input validation and preparation
@@ -57,35 +57,35 @@ function ActiveNoiseCancellation(varargin)
 
         % Feedforward LMS
         testCaseName = "Feedforward LMS";
-        ffLMS = feedforwardLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        ffLMS = ffLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedforward FxLMS
         testCaseName = "Feedforward FxLMS";
-        ffFxLMS = feedforwardFxLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        ffFxLMS = ffFxLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedforward NLMS
         testCaseName = "Feedforward NLMS";
-        ffNLMS = feedforwardNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        ffNLMS = ffNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedforward FxNLMS
         testCaseName = "Feedforward FxNLMS";
-        ffFxNLMS = feedforwardFxNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        ffFxNLMS = ffFxNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedback LMS
         testCaseName = "Feedback LMS";
-        fbLMS = feedbackLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        fbLMS = fbLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
     
         % Feedback FxLMS
         testCaseName = "Feedback FxLMS";
-        fbFxLMS = feedbackFxLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        fbFxLMS = fbFxLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedback NLMS
         testCaseName = "Feedback NLMS";
-        fbNLMS = feedbackNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        fbNLMS = fbNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         % Feedback FxNLMS
         testCaseName = "Feedback FxNLMS";
-        fbFxNLMS = feedbackFxNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
+        fbFxNLMS = fbFxNLMS(inputSignal, fs, pzFilter, bufferSize, testCaseName, testMode);
 
         disp("[INFO] Simulation of noise cancellation done.");
   
@@ -94,14 +94,14 @@ function ActiveNoiseCancellation(varargin)
         sigLength = length(inputSignal);
         getPlots = getPlotResults(sigLength, fs);
 
-        feedforwardResults = [ffLMS, ffFxLMS, ffNLMS, ffFxNLMS];
-        feedforwardSystemNames = ["Feedforward LMS", "Feedforward FxLMS", "Feedforward NLMS", "Feedforward FxNLMS"];
-        feedbackResults = [fbLMS, fbFxLMS, fbNLMS, fbFxNLMS];
-        feedbackSystemNames = ["Feedback LMS", "Feedback FxLMS", "Feedback NLMS", "Feedback FxNLMS"];
+        ffResults = [ffLMS, ffFxLMS, ffNLMS, ffFxNLMS];
+        ffSystemNames = ["Feedforward LMS", "Feedforward FxLMS", "Feedforward NLMS", "Feedforward FxNLMS"];
+        fbResults = [fbLMS, fbFxLMS, fbNLMS, fbFxNLMS];
+        fbSystemNames = ["Feedback LMS", "Feedback FxLMS", "Feedback NLMS", "Feedback FxNLMS"];
 
         getPlots.getInputSignalPlot(inputSignal);
-        getPlots.compareAllOneSystemResults(feedforwardSystemNames, inputSignal, feedforwardResults);
-        getPlots.compareAllOneSystemResults(feedbackSystemNames, inputSignal, feedbackResults);
+        getPlots.compareAllOneSystemResults(ffSystemNames, inputSignal, ffResults);
+        getPlots.compareAllOneSystemResults(fbSystemNames, inputSignal, fbResults);
         disp("[INFO] Generate comparison done.");
 
     catch ME
